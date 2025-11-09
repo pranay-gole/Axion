@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Flappy Neon</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='games/flappy/style.css') }}">
+</head>
+<body>
+  <div id="game-container">
+    <canvas id="gameCanvas"></canvas>
+
+    <div id="ui">
+      <div id="score">0</div>
+      <div id="message">Tap SPACE to start</div>
+      <div id="instructions">[P] Pause | [R] Restart</div>
+    </div>
+  </div>
+
+  <script src="{{ url_for('static', filename='games/flappy/script.js') }}"></script>
+</body>
+</html>

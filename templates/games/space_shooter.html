@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Retro Neon Space Shooter</title>
+
+  <!-- ✅ Correct Flask path for CSS -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='games/space-shooter/style.css') }}">
+<body>
+  <div class="wrap">
+    <canvas id="screen" width="900" height="560"></canvas>
+
+    <div class="hud">
+      <div class="row">
+        <div class="pill">Score: <span id="score">0</span></div>
+        <div class="pill">Wave: <span id="wave">1</span></div>
+        <div class="pill">Lives: <span id="lives">3</span></div>
+      </div>
+
+      <div class="row" style="margin-top:10px">
+        <div class="pill">Weapon: <span id="wep">Blaster</span></div>
+        <div class="meter"><i id="hp" style="width:100%"></i></div>
+      </div>
+
+      <div id="overlay" class="center">
+        <h1 class="title">RETRO NEON SHOOTER</h1>
+        <p class="sub">←/→ or A/D to move • SPACE to fire • P to pause • R to restart</p>
+        <div class="pill">Press <b>SPACE</b> to start</div>
+      </div>
+
+      <div id="pauseUI" class="center" style="display:none">
+        <h2 class="title">Paused</h2>
+        <p class="sub">Press <b>P</b> to resume</p>
+      </div>
+
+      <div id="overUI" class="center" style="display:none">
+        <h2 class="title" style="color:#ff4d8d">Game Over</h2>
+        <p class="sub">Score: <span id="final">0</span></p>
+        <div class="pill">Press <b>R</b> to restart</div>
+      </div>
+
+      <div class="controls">
+        <div class="btn" id="leftBtn">◀</div>
+        <div class="btn" id="fireBtn">FIRE</div>
+        <div class="btn" id="rightBtn">▶</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ✅ Correct Flask path for JS -->
+  <script src="{{ url_for('static', filename='games/space-shooter/main.js') }}"></script>
+</body>
+</html>

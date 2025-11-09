@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Your Profile</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    * {margin: 0; padding: 0; box-sizing: border-box;}
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: #0f0f0f;
+      color: #e0e0e0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    .back {
+      position: absolute; top: 20px; left: 20px;
+      text-decoration: none; font-weight: 600; color: #ddd;
+      border: 1px solid #444; padding: 8px 14px; border-radius: 8px;
+      background: #1a1a1a; transition: 0.3s;
+    }
+    .back:hover {background: #2a2a2a;}
+
+    .profile-box {
+      background: #1b1b1b; border: 1px solid #2c2c2c; border-radius: 14px;
+      padding: 40px 60px; box-shadow: 0 4px 25px rgba(0, 0, 0, 0.4);
+      width: 720px; animation: fadeIn 0.6s ease;
+    }
+
+    @keyframes fadeIn {from {opacity: 0; transform: translateY(-15px);} to {opacity: 1; transform: translateY(0);}}
+
+    .avatar-preview {
+      width: 120px; height: 120px; border-radius: 50%;
+      object-fit: cover; border: 2px solid #2a84ff; margin-bottom: 10px;
+      transition: all 0.4s ease;
+    }
+    .avatar-preview:hover {box-shadow: 0 0 20px #2a84ff99; transform: scale(1.05);}
+
+    h2 {color: #fff; margin-bottom: 10px; font-size: 1.4rem;}
+    p {color: #aaa; font-size: 0.9rem; margin-bottom: 10px;}
+
+    .btn {
+      display: inline-block; padding: 10px 25px; border: none; border-radius: 8px;
+      background: #2a84ff; color: #fff; font-weight: 600; cursor: pointer;
+      transition: 0.3s; text-decoration: none; font-size: 0.95rem;
+    }
+    .btn:hover {background: #1b6de2;}
+
+    .profile-top {
+      display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap;
+      text-align: center;
+    }
+
+    .left-info {flex: 1; min-width: 240px; text-align: center;}
+    .right-avatars {flex: 1; min-width: 240px; text-align: center;}
+
+    .avatar-selection {
+      display: flex; justify-content: center; flex-wrap: wrap;
+      gap: 10px; margin: 10px 0;
+    }
+    .avatar-selection img {
+      width: 60px; height: 60px; border-radius: 50%;
+      border: 2px solid transparent; object-fit: cover; transition: 0.3s;
+    }
+    .avatar-selection input {display: none;}
+    .avatar-selection input:checked + img {
+      border-color: #2a84ff; box-shadow: 0 0 10px #2a84ff55;
+    }
+
+    .rank-display img {transition: all 0.3s ease;}
+    .rank-display img:hover {transform: scale(1.1); box-shadow: 0 0 18px rgba(42,132,255,0.6);}
+    .rank-display span:hover {text-shadow: 0 0 10px currentColor;}
+
+    /* ===== Modal Styles ===== */
+    .modal-overlay {
+      position: fixed; inset: 0; background: rgba(0,0,0,0.7);
+      display: flex; justify-content: center; align-items: center;
+      opacity: 0; visibility: hidden; transition: all 0.4s ease;
+    }
+    .modal-overlay.active {opacity: 1; visibility: visible;}
+
+    .modal {
+      background: #1c1c1c; padding: 30px 40px; border-radius: 12px;
+      box-shadow: 0 0 25px rgba(42,132,255,0.3);
+      width: 400px; transform: scale(0.8); opacity: 0; transition: all 0.4s ease;
+    }
+    .modal.active {transform: scale(1); opacity: 1;}
+    .modal h3 {margin-bottom: 20px; text-align: center; color: #fff;}
+
+    .modal input,
+    .modal textarea {
+      width: 100%; padding: 10px; border-radius: 6px;
+      border: 1px solid #333; background: #111; color: #ddd;
+      margin-bottom: 15px; font-size: 0.9rem;
+    }
+    .modal input:focus,
+    .modal textarea:focus {
+      border-color: #2a84ff; box-shadow: 0 0 5px #2a84ff66; outline: none;
+    }
+
+    .modal-buttons {
+      display: flex; justify-content: space-between; margin-top: 10px;
+    }
+  </style>
+</head>
+<body>
+
+  <a href="{{ url_for('dashboard') }}" class="back">← Back</a>
+
+  <div class="profile-box">
+    <div class="profile-top">
+      <div class="left-info">
+        <img src="{{ url_for('static', filename='images/avatars/' + (session.get('avatar') or 'avatar1.png')) }}"
+             alt="Avatar" class="avatar-preview">
+        <h2>{{ session['username'] }}</h2>
+      </div>
+
+      <div class="right-avatars">
+        <p>Choose your avatar:</p>
+        <form action="/update_avatar" method="POST" class="avatar-form">
+          <div class="avatar-selection">
+            {% for i in range(1, 7) %}
+              <label><input type="radio" name="avatar" value="avatar{{ i }}.png"> 
+              <img src="/static/images/avatars/avatar{{ i }}.png"></label>
+            {% endfor %}
+          </div>
+          <button type="submit" class="btn">Save Avatar</button>
+        </form>
+      </div>
+    </div>
+
+    <div class="profile-info" style="margin-top: 25px;">
+      <p><b>Email:</b> {{ session.get('email', 'user@example.com') }}</p>
+      <p><b>Date of Birth:</b> {{ session.get('dob', 'Not set') }}</p>
+      <p><b>Bio:</b> {{ session.get('bio', 'No bio yet.') }}</p>
+    </div>
+
+    {% set exp_val = session.get('exp', 0) %}
+    {% if exp_val < 200 %}
+      {% set rank = "Beginner" %}
+      {% set badge = "beginner.png" %}
+    {% elif exp_val < 500 %}
+      {% set rank = "Intermediate" %}
+      {% set badge = "intermediate.png" %}
+    {% elif exp_val < 1000 %}
+      {% set rank = "Pro Gamer" %}
+      {% set badge = "pro.png" %}
+    {% else %}
+      {% set rank = "Legend" %}
+      {% set badge = "legend.png" %}
+    {% endif %}
+
+    <div class="rank-section" style="margin-top:30px; text-align:center;">
+      <p><b>Rank:</b></p>
+      <div class="rank-display" style="margin-top:10px; display:flex; flex-direction:column; align-items:center; gap:10px;">
+        <img src="{{ url_for('static', filename='images/ranks/' + badge) }}" alt="{{ rank }} Badge" style="width:80px; height:80px;">
+        <span style="font-size:1.1rem; font-weight:600;">
+          {% if rank == "Beginner" %}
+            <span style="color:#00ff99;">{{ rank }}</span>
+          {% elif rank == "Intermediate" %}
+            <span style="color:#00aaff;">{{ rank }}</span>
+          {% elif rank == "Pro Gamer" %}
+            <span style="color:#a45bff;">{{ rank }}</span>
+          {% else %}
+            <span style="color:#ff4444;">{{ rank }}</span>
+          {% endif %}
+        </span>
+      </div>
+    </div>
+
+    <div style="margin-top:25px; display:flex; justify-content:center; gap:15px;">
+      <button class="btn" onclick="openModal()">Edit Profile</button>
+      <a href="/logout" class="btn">Logout</a>
+    </div>
+  </div>
+
+  <!-- Modal for Edit Profile -->
+  <div id="modalOverlay" class="modal-overlay">
+    <div class="modal" id="editModal">
+      <h3>Edit Profile</h3>
+      <form id="editForm" action="/update_profile" method="POST">
+        <input type="email" name="email" placeholder="Enter your email" value="{{ session.get('email', '') }}" required>
+
+        <!-- Text input with auto format -->
+        <input type="text" name="dob" id="dob" placeholder="YYYY-MM-DD"
+               pattern="\d{4}-\d{2}-\d{2}"
+               title="Enter date in YYYY-MM-DD format"
+               value="{{ session.get('dob', '') }}" required>
+
+        <textarea name="bio" placeholder="Write something about yourself..." rows="3">{{ session.get('bio', '') }}</textarea>
+
+        <div class="modal-buttons">
+          <button type="submit" class="btn">Save</button>
+          <button type="button" class="btn" onclick="closeModal()">Cancel</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    const modalOverlay = document.getElementById('modalOverlay');
+    const modal = document.getElementById('editModal');
+    const dobInput = document.getElementById('dob');
+
+    function openModal() {
+      modalOverlay.classList.add('active');
+      modal.classList.add('active');
+    }
+
+    function closeModal() {
+      modalOverlay.classList.remove('active');
+      modal.classList.remove('active');
+    }
+
+    modalOverlay.addEventListener('click', (e) => {
+      if (e.target === modalOverlay) closeModal();
+    });
+
+    // Auto format YYYY-MM-DD while typing
+    dobInput.addEventListener('input', (e) => {
+      let value = e.target.value.replace(/[^0-9]/g, '');
+      if (value.length > 4 && value.length <= 6) value = value.slice(0,4) + '-' + value.slice(4);
+      else if (value.length > 6) value = value.slice(0,4) + '-' + value.slice(4,6) + '-' + value.slice(6,8);
+      e.target.value = value;
+    });
+  </script>
+</body>
+</html>

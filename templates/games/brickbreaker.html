@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Brick Breaker</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='games/brickbreaker/style.css') }}">
+</head>
+<body>
+  <canvas id="brickCanvas"></canvas>
+  <div id="overlay">
+    <p id="overlay-text">Press S to Start</p>
+  </div>
+  <script src="{{ url_for('static', filename='games/brickbreaker/script.js') }}"></script>
+</body>
+</html>

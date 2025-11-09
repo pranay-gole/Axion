@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Tic Tac Toe</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='games/tictactoe/style.css') }}">
+  <style>
+    /* Extra mobile tweaks */
+    @media (max-width: 768px) {
+      h1 {
+        font-size: 1.8rem;
+      }
+
+      #status {
+        font-size: 0.95rem;
+      }
+
+      .board {
+        grid-template-columns: repeat(3, 80px);
+        gap: 6px;
+      }
+
+      .cell {
+        width: 80px;
+        height: 80px;
+        font-size: 2rem;
+      }
+
+      button {
+        padding: 10px 20px;
+        font-size: 0.95rem;
+      }
+    }
+
+    @media (max-width: 480px) {
+      h1 {
+        font-size: 1.5rem;
+      }
+
+      #status {
+        font-size: 0.85rem;
+      }
+
+      .board {
+        grid-template-columns: repeat(3, 70px);
+        gap: 5px;
+      }
+
+      .cell {
+        width: 70px;
+        height: 70px;
+        font-size: 1.7rem;
+      }
+
+      button {
+        padding: 8px 18px;
+        font-size: 0.85rem;
+      }
+
+      .container {
+        width: 95%;
+        margin: auto;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Particle background -->
+  <canvas id="particles"></canvas>
+
+  <div class="container">
+    <h1>Tic Tac Toe</h1>
+    <p id="status">Player X's turn</p>
+
+    <div class="board" id="board">
+      <div class="cell" data-cell></div>
+      <div class="cell" data-cell></div>
+      <div class="cell" data-cell></div>
+      <div class="cell" data-cell></div>
+      <div class="cell" data-cell></div>
+      <div class="cell" data-cell></div>
+      <div class="cell" data-cell></div>
+      <div class="cell" data-cell></div>
+      <div class="cell" data-cell></div>
+    </div>
+
+    <button id="restartBtn">Restart</button>
+  </div>
+
+  <!-- Game logic -->
+  <script src="{{ url_for('static', filename='games/tictactoe/script.js') }}"></script>
+  <!-- Particle animation -->
+  <script src="{{ url_for('static', filename='games/tictactoe/particles.js') }}"></script>
+</body>
+</html>

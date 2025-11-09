@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Maze Escape</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='games/maze_escape/style.css') }}">
+</head>
+<body>
+  <canvas id="mazeCanvas"></canvas>
+
+  <div id="overlay">
+    <div class="overlay-box">
+      <p id="overlay-text">Press S to Start</p>
+    </div>
+  </div>
+
+  <script src="{{ url_for('static', filename='games/maze_escape/script.js') }}"></script>
+</body>
+</html>

@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Fruit Catcher</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='games/fruit_catcher/style.css') }}">
+</head>
+<body>
+  <canvas id="gameCanvas"></canvas>
+
+  <div id="overlay">
+    <div class="overlay-box">
+      <p id="overlay-text">Press S to Start</p>
+    </div>
+  </div>
+
+  <script src="{{ url_for('static', filename='games/fruit_catcher/script.js') }}"></script>
+</body>
+</html>

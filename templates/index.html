@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta charset="UTF-8">
+  <title>Axion Portal</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    html, body {
+      height: 100%;
+      font-family: 'Segoe UI', sans-serif;
+      color: white;
+      overflow: hidden;
+    }
+
+    body::before {
+      content: "";
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: url("/static/images/dashboard_bg.png") no-repeat center center fixed;
+      background-size: cover;
+      opacity: 0.25;
+      z-index: -3;
+    }
+
+    /* 🔹 Background & overlay */
+    body {
+      background: url('/static/images/dashboard_bg.png') no-repeat center center fixed;
+      background-size: cover;
+    }
+
+    .overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: rgba(0, 0, 20, 0.4);
+      z-index: -2;
+    }
+
+    .particles {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-image: radial-gradient(#ffffff11 1px, transparent 1px);
+      background-size: 40px 40px;
+      z-index: -1;
+    }
+
+    .container {
+      position: relative;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      padding: 20px;
+    }
+
+    .glass-card {
+      background: rgba(255, 255, 255, 0.08);
+      padding: 40px;
+      border-radius: 16px;
+      backdrop-filter: blur(10px);
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+      animation: fadeIn 1.5s ease-in-out;
+    }
+
+    /* 🔹 Softer Glowing AXION Title */
+    .logo-title {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 3.5rem;
+      font-weight: 800;
+      letter-spacing: 8px;
+      background: linear-gradient(90deg, #00fff7, #00c8ff, #00fff7);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      text-shadow: 
+        0 0 6px #00fff7cc,
+        0 0 12px #00fff7aa,
+        0 0 18px #00fff766;
+      animation: softPulse 4s infinite ease-in-out;
+      margin-bottom: 20px;
+    }
+
+    @keyframes softPulse {
+      0% {
+        text-shadow: 0 0 6px #00fff7cc, 0 0 12px #00fff7aa, 0 0 18px #00fff766;
+      }
+      50% {
+        text-shadow: 0 0 10px #00fff7cc, 0 0 18px #00fff7aa, 0 0 25px #00fff744;
+      }
+      100% {
+        text-shadow: 0 0 6px #00fff7cc, 0 0 12px #00fff7aa, 0 0 18px #00fff766;
+      }
+    }
+
+    h1 {
+      font-size: 2em;
+      margin-bottom: 15px;
+      text-shadow: 2px 2px 8px #00000055;
+    }
+
+    p {
+      font-size: 1.2em;
+      margin-bottom: 30px;
+    }
+
+    .buttons {
+      display: flex;
+      gap: 20px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    .btn {
+      position: relative;
+      padding: 15px 40px;
+      color: #00fff7;
+      font-size: 1em;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      background: transparent;
+      border: 2px solid #00fff7;
+      border-radius: 10px;
+      text-decoration: none;
+      transition: 0.4s ease-in-out;
+      box-shadow: 0 0 8px #00fff744, 0 0 20px #00fff722 inset;
+      backdrop-filter: blur(4px);
+      z-index: 1;
+      overflow: hidden;
+    }
+
+    .btn:hover {
+      background-color: rgba(0, 255, 247, 0.1);
+      box-shadow: 0 0 20px #00fff7cc, 0 0 40px #00fff7aa inset;
+      color: white;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(-20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    #stars {
+      position: fixed;
+      top: 0;
+      left: 0;
+      z-index: -3;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Background layers -->
+  <canvas id="stars"></canvas>
+  <div class="overlay"></div>
+  <div class="particles"></div>
+
+  <!-- Main content -->
+  <div class="container">
+    <div class="glass-card">
+      <div class="logo-title">A X I O N</div>
+      <h1>Welcome to Axion</h1>
+      <p>Stream and play browser games instantly. No install. Just fun.</p>
+      <div class="buttons">
+        <a href="/login" class="btn">Login</a>
+        <a href="/register" class="btn">Register</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Star Animation -->
+  <script>
+    const canvas = document.getElementById("stars");
+    const ctx = canvas.getContext("2d");
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+
+    const stars = [];
+    for (let i = 0; i < 150; i++) {
+      stars.push({
+        x: Math.random() * canvas.width,
+        y: Math.random() * canvas.height,
+        radius: Math.random() * 1.5,
+        speed: Math.random() * 0.5 + 0.2
+      });
+    }
+
+    function animate() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      for (const star of stars) {
+        star.y += star.speed;
+        if (star.y > canvas.height) star.y = 0;
+        ctx.beginPath();
+        ctx.arc(star.x, star.y, star.radius, 0, 2 * Math.PI);
+        ctx.fillStyle = "#00fff7aa";
+        ctx.fill();
+      }
+      requestAnimationFrame(animate);
+    }
+
+    animate();
+  </script>
+</body>
+</html>

@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta charset="UTF-8">
+  <title>Axion Dashboard</title>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600;800&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: url("/static/images/dashboard_bg.png") no-repeat center center fixed;
+      background-size: cover;
+      color: white;
+      overflow-x: hidden;
+    }
+
+    .container {
+      text-align: center;
+      padding-top: 50px;
+    }
+
+    /* 🩵 Clean AXION Title - No Glow */
+    .logo {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 2.8em;
+      font-weight: 800;
+      letter-spacing: 6px;
+      background: linear-gradient(90deg, #00fff7, #00b3ff);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      text-shadow: none;
+    }
+
+    .welcome {
+      margin-top: 10px;
+      font-size: 1.2em;
+    }
+
+    .games-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 30px;
+      margin: 40px;
+      justify-items: center;
+    }
+
+    .game-card {
+      background: rgba(0, 0, 0, 0.5);
+      padding: 25px;
+      border-radius: 12px;
+      box-shadow: 0 0 15px #00fff7aa;
+      text-align: center;
+      width: 200px;
+      transition: transform 0.3s ease;
+    }
+
+    .game-card:hover {
+      transform: scale(1.05);
+    }
+
+    .game-icon {
+      width: 64px;
+      height: 64px;
+      margin-bottom: 10px;
+    }
+
+    .game-title {
+      font-size: 1.1em;
+      color: #00fff7;
+      margin-bottom: 12px;
+      text-shadow: 0 0 5px #00fff7;
+    }
+
+    .play-btn {
+      padding: 10px 20px;
+      border: 2px solid #00fff7;
+      border-radius: 8px;
+      background: transparent;
+      color: #00fff7;
+      cursor: pointer;
+      font-weight: bold;
+      box-shadow: 0 0 10px #00fff755;
+      transition: 0.3s ease;
+    }
+
+    .play-btn:hover {
+      background-color: #00fff7;
+      color: #000;
+      box-shadow: 0 0 20px #00fff7cc;
+    }
+
+    /* === PROFILE BUTTON (TOP-RIGHT) === */
+    .top-buttons {
+      position: absolute;
+      top: 20px;
+      right: 30px;
+    }
+
+    .top-btn {
+      padding: 8px 18px;
+      background-color: transparent;
+      border: 2px solid #00fff7;
+      color: #00fff7;
+      border-radius: 6px;
+      font-weight: bold;
+      cursor: pointer;
+      box-shadow: 0 0 8px #00fff766;
+      transition: 0.3s ease;
+      text-decoration: none;
+      font-family: 'Orbitron', sans-serif;
+      letter-spacing: 0.5px;
+    }
+
+    .top-btn:hover {
+      background-color: #00fff7;
+      color: black;
+      box-shadow: 0 0 20px #00fff7aa;
+    }
+
+    /* Responsive tweaks */
+    @media (max-width: 768px) {
+      .topbar { flex-direction: column; gap: 10px; padding: 12px; }
+      .game-card { width: 100%; padding: 18px; }
+      .games-grid { gap: 12px; }
+      .btn { padding: 12px 16px; font-size: 16px; }
+    }
+    @media (max-width: 420px) {
+      .title { font-size: 22px; }
+      .subtitle { font-size: 12px; }
+      .game-card h3 { font-size: 16px; }
+      .game-card p { font-size: 12px; }
+      .topbar input[type="search"] { width: 100%; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ✅ ONLY PROFILE BUTTON (no logout) -->
+  <div class="top-buttons">
+    <a href="{{ url_for('profile') }}" class="top-btn">👤 Profile</a>
+  </div>
+
+  <div class="container">
+    <div class="logo">Axion</div>
+    <div class="welcome">Welcome, {{ username }}! Choose your game:</div>
+
+    <div class="games-grid">
+
+      <div class="game-card">
+        <img src="/static/images/icon/tictactoe.png" alt="Tic Tac Toe" class="game-icon">
+        <div class="game-title">Tic Tac Toe</div>
+        <a href="/tictactoe"><button class="play-btn">Play Now</button></a>
+      </div>
+
+      <div class="game-card">
+        <img src="/static/images/icon/memoryflip.png" alt="Memory Flip" class="game-icon">
+        <div class="game-title">Memory Flip</div>
+        <a href="/memory"><button class="play-btn">Play Now</button></a>
+      </div>
+
+      <div class="game-card">
+        <img src="/static/images/icon/snake.png" alt="Snake Game" class="game-icon">
+        <div class="game-title">Snake Game</div>
+        <a href="/snake"><button class="play-btn">Play Now</button></a>
+      </div>
+
+      <div class="game-card">
+        <img src="/static/images/icon/brickbreaker.png" alt="Brick Breaker" class="game-icon">
+        <div class="game-title">Brick Breaker</div>
+        <a href="/brickbreaker"><button class="play-btn">Play Now</button></a>
+      </div>
+
+      <div class="game-card">
+        <img src="/static/images/icon/spaceshooter.png" alt="Space Shooter" class="game-icon">
+        <div class="game-title">Space Shooter</div>
+        <a href="/games/space-shooter">
+          <button class="play-btn">Play Now</button>
+        </a>
+      </div>
+
+      <div class="game-card">
+        <img src="/static/images/icon/maze_escape.png" alt="Dynamic Maze Escape" class="game-icon">
+        <div class="game-title">Dynamic Maze Escape</div>
+        <a href="/maze_escape"><button class="play-btn">Play Now</button></a>
+      </div>
+
+      <div class="game-card">
+        <img src="/static/images/icon/fruitcatcher.png" alt="Fruit Catcher" class="game-icon">
+        <div class="game-title">Fruit Catcher</div>
+        <a href="/fruitcatcher"><button class="play-btn">Play Now</button></a>
+      </div>
+
+      <div class="game-card">
+        <img src="/static/images/icon/flappy.png" alt="Flappy Neon" class="game-icon">
+        <div class="game-title">Flappy Neon</div>
+        <a href="/flappy"><button class="play-btn">Play Now</button></a>
+      </div>
+
+    </div>
+  </div>
+</body>
+</html>

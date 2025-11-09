@@ -1,0 +1,135 @@
+/* Clean, simple Memory Flip with particle background */
+body {
+  margin: 0;
+  font-family: 'Orbitron', sans-serif;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+  background: radial-gradient(circle at center, #0f0f0f 0%, #1a1a1a 100%);
+  color: #00ffff;
+  overflow: hidden;
+}
+
+canvas#particles {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: -1;
+  width: 100%;
+  height: 100%;
+}
+
+h1 {
+  margin-bottom: 20px;
+  color: #00ffff;
+  text-shadow: 0 0 10px #00ffff;
+}
+
+.game-board {
+  display: grid;
+  grid-template-columns: repeat(4, 100px);
+  grid-gap: 15px;
+  perspective: 1000px;
+}
+
+.card {
+  width: 100px;
+  height: 100px;
+  position: relative;
+  transform-style: preserve-3d;
+  transform: rotateY(0deg);
+  transition: transform 0.5s;
+  cursor: pointer;
+}
+
+.card.flipped {
+  transform: rotateY(180deg);
+}
+
+.front, .back {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  backface-visibility: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 10px;
+  font-size: 24px;
+}
+
+.front {
+  background: #222;
+  border: 2px solid #00ffff;
+}
+
+.back {
+  background: #00ffff;
+  color: #000;
+  transform: rotateY(180deg);
+}
+
+button {
+  margin-top: 30px;
+  padding: 10px 20px;
+  border: none;
+  background-color: #00ffff;
+  color: #000;
+  font-size: 16px;
+  cursor: pointer;
+  border-radius: 5px;
+  box-shadow: 0 0 10px #00ffff;
+}
+
+/* Scoreboard */
+.scoreboard {
+  display: flex;
+  gap: 18px;
+  align-items: center;
+  margin: 10px 0 18px;
+}
+.player {
+  padding: 8px 14px;
+  border: 1px solid #00ffff;
+  border-radius: 10px;
+  box-shadow: 0 0 12px rgba(0,255,255,.2);
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  min-width: 140px;
+  justify-content: space-between;
+}
+.player span { color: #00ffff; font-weight: 600; letter-spacing: .5px; }
+.player strong { font-size: 1.25rem; }
+.player.active { box-shadow: 0 0 18px #00ffff; border-color: #00ffff; }
+
+.overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.85);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  visibility: hidden;
+  opacity: 0;
+  transition: 0.3s ease;
+  z-index: 10;
+}
+.overlay.active {
+  visibility: visible;
+  opacity: 1;
+}
+.message-box {
+  background: rgba(20, 20, 35, 0.95);
+  color: #fff;
+  padding: 25px 45px;
+  border-radius: 16px;
+  text-align: center;
+  font-size: 1.3rem;
+  box-shadow: 0 0 20px #00ffff;
+}

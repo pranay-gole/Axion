@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Memory Flip</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='games/memoryflip/style.css') }}">
+</head>
+<body>
+  <canvas id="particles"></canvas>
+
+  <h1>Memory Flip</h1>
+
+  <div class="scoreboard">
+    <div class="player active" id="p1">
+      <span>Player 1</span> <strong id="p1Score">0</strong>
+    </div>
+    <div class="player" id="p2">
+      <span>Player 2</span> <strong id="p2Score">0</strong>
+    </div>
+  </div>
+
+  <div class="game-board" id="gameBoard"></div>
+
+  <div id="overlay" class="overlay">
+    <div class="message-box">
+      <p id="winnerMessage"></p>
+    </div>
+  </div>
+
+  <script src="{{ url_for('static', filename='games/memoryflip/particles.js') }}"></script>
+  <script src="{{ url_for('static', filename='games/memoryflip/script.js') }}"></script>
+</body>
+</html>
