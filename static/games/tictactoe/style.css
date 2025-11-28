@@ -156,3 +156,45 @@ button:hover {
     margin: auto;
   }
 }
+
+.exit-gate {
+  position: absolute;
+  top: 16px;
+  left: 16px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  border-radius: 999px;
+  border: 2px solid #00fff7;
+  background: rgba(0, 10, 25, 0.85);
+  color: #00fff7;
+  font-family: 'Orbitron', sans-serif;
+  font-size: 0.9rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  text-decoration: none;
+  box-shadow: 0 0 16px rgba(0, 255, 247, 0.6);
+  cursor: pointer;
+  z-index: 999;
+  transition: 0.2s ease;
+}
+
+.exit-gate-icon {
+  font-size: 1.1rem;
+}
+
+.exit-gate:hover {
+  background: rgba(0, 255, 247, 0.1);
+  box-shadow: 0 0 24px rgba(0, 255, 247, 0.9);
+}
+
+/* mobile pe thoda chhota */
+@media (max-width: 768px) {
+  .exit-gate {
+    top: 10px;
+    left: 10px;
+    padding: 6px 12px;
+    font-size: 0.75rem;
+  }
+}

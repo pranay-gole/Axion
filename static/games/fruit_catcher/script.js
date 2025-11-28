@@ -70,12 +70,18 @@ function drawFruits() {
   });
 }
 
-// 💻 Draw UI
+// 💻 Draw UI  (Score + Level)
+// 👉 Score top-left me thoda andar, Level top-right = exit gate se door
 function drawUI() {
+  ctx.save();
   ctx.fillStyle = "#00ffff";
   ctx.font = "20px Orbitron";
-  ctx.fillText(`Score: ${score}`, 20, 35);
-  ctx.fillText(`Level: ${level}`, canvas.width - 130, 35);
+  ctx.textAlign = "left";
+  ctx.fillText(`Score: ${score}`, 24, 34);
+
+  ctx.textAlign = "right";
+  ctx.fillText(`Level: ${level}`, canvas.width - 24, 34);
+  ctx.restore();
 }
 
 // 🧺 Keep basket inside bounds
@@ -156,13 +162,24 @@ function showLevelUp() {
   }, 800);
 }
 
-// 💣 Bomb loss
+// 💣 Bomb loss – show final score + level
 function triggerBombLose() {
   gameRunning = false;
   clearTimeout(spawnInterval);
   overlay.style.display = "flex";
   overlayText.style.color = "red";
-  overlayText.textContent = "💥 YOU LOOSE";
+  overlayText.innerHTML = `
+    💥 YOU LOST<br><br>
+    <span style="color:#00ffff; font-size:1.2rem;">
+      Final Score: ${score}
+    </span><br>
+    <span style="color:#ffaa00; font-size:1rem;">
+      Level Reached: ${level}
+    </span><br><br>
+    <span style="font-size:0.95rem; color:#ffffff;">
+      Press R to Restart
+    </span>
+  `;
 }
 
 // 🍊 Faster spawn loop
@@ -218,7 +235,7 @@ function restartGame() {
   paused = false;
   gameRunning = false;
   overlayText.style.color = "#00ffff";
-  overlayText.textContent = "Press S to Start";
+  overlayText.innerHTML = "Press S to Start";
   overlay.style.display = "flex";
 }
 
@@ -228,6 +245,7 @@ function animate() {
   requestAnimationFrame(animate);
 }
 
-overlayText.textContent = "Press S to Start";
+// initial screen
+overlayText.innerHTML = "Press S to Start";
 overlay.style.display = "flex";
 animate();

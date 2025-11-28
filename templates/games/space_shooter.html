@@ -7,7 +7,15 @@
 
   <!-- ✅ Correct Flask path for CSS -->
   <link rel="stylesheet" href="{{ url_for('static', filename='games/space-shooter/style.css') }}">
+</head>
 <body>
+
+  <!-- 🔥 Exit Gate Added -->
+  <a href="{{ url_for('dashboard') }}" class="exit-gate">
+    <span class="exit-gate-icon">⮌</span>
+    <span>Exit Gate</span>
+  </a>
+  
   <div class="wrap">
     <canvas id="screen" width="900" height="560"></canvas>
 

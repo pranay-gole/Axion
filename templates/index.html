@@ -25,7 +25,7 @@
       left: 0;
       width: 100%;
       height: 100%;
-      background: url("/static/images/dashboard_bg.png") no-repeat center center fixed;
+      background: url("/static/images/axion_bg.png") no-repeat center center fixed;
       background-size: cover;
       opacity: 0.25;
       z-index: -3;
@@ -33,7 +33,7 @@
 
     /* 🔹 Background & overlay */
     body {
-      background: url('/static/images/dashboard_bg.png') no-repeat center center fixed;
+      background: url('/static/images/axion_bg.png') no-repeat center center fixed;
       background-size: cover;
     }
 
@@ -70,7 +70,7 @@
     }
 
     .glass-card {
-      background: rgba(255, 255, 255, 0.08);
+      background: rgba(0, 0, 0, 0.4);
       padding: 40px;
       border-radius: 16px;
       backdrop-filter: blur(10px);
@@ -78,22 +78,24 @@
       animation: fadeIn 1.5s ease-in-out;
     }
 
-    /* 🔹 Softer Glowing AXION Title */
     .logo-title {
-      font-family: 'Orbitron', sans-serif;
-      font-size: 3.5rem;
-      font-weight: 800;
-      letter-spacing: 8px;
-      background: linear-gradient(90deg, #00fff7, #00c8ff, #00fff7);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      text-shadow: 
-        0 0 6px #00fff7cc,
-        0 0 12px #00fff7aa,
-        0 0 18px #00fff766;
-      animation: softPulse 4s infinite ease-in-out;
-      margin-bottom: 20px;
-    }
+        font-family: 'Orbitron', sans-serif;
+        font-size: 4rem;
+        font-weight: 900;
+        letter-spacing: 14px;
+        text-transform: uppercase;
+        margin-bottom: 25px;
+
+        /* original neon blue */
+        color: #00eaff;
+
+        /* soft glow (reduced) */
+        text-shadow:
+          0 0 6px rgba(0, 234, 255, 0.4),
+          0 0 12px rgba(0, 234, 255, 0.25);
+
+        opacity: 0.95;
+      }
 
     @keyframes softPulse {
       0% {

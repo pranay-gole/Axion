@@ -2,6 +2,7 @@ const canvas = document.getElementById("gameCanvas");
 const ctx = canvas.getContext("2d");
 const scoreDisplay = document.getElementById("score");
 const message = document.getElementById("message");
+const jumpBtn = document.getElementById("jumpBtn");
 
 let orb = { x: 150, y: 300, radius: 15, velocity: 0 };
 let gravity = 0.5;
@@ -32,7 +33,7 @@ function resetGame() {
   started = false;
   paused = false;
   scoreDisplay.textContent = "0";
-  message.textContent = "Tap SPACE to start";
+  message.textContent = "Tap or press SPACE to start";
   message.style.display = "block";
 }
 
@@ -111,7 +112,7 @@ function update() {
   drawOrb();
 
   if (gameOver) {
-    message.textContent = "💀 Game Over! Press R to Restart";
+    message.textContent = "💀 Game Over! Press R or tap to Restart";
     message.style.display = "block";
   }
 
@@ -121,18 +122,50 @@ function update() {
 function flap() {
   if (!started) {
     started = true;
-    message.style.display = "none";
+    if (!gameOver) {
+      message.style.display = "none";
+    }
   }
   if (!gameOver && !paused) {
     orb.velocity = jump;
   }
 }
 
+// Keyboard controls
 document.addEventListener("keydown", (e) => {
-  if (e.code === "Space") flap();
+  if (e.code === "Space") {
+    e.preventDefault();
+    flap();
+  }
   if (e.key === "r" || e.key === "R") resetGame();
-  if (e.key === "p" || e.key === "P") paused = !paused;
+  if (e.key === "p" || e.key === "P") {
+    paused = !paused;
+    if (!paused && !gameOver && started) {
+      message.style.display = "none";
+    }
+  }
 });
+
+// 🖱️ Mouse click anywhere on canvas = flap
+canvas.addEventListener("mousedown", () => {
+  flap();
+});
+
+// 📱 Tap on canvas = flap
+canvas.addEventListener("touchstart", (e) => {
+  e.preventDefault();
+  flap();
+}, { passive: false });
+
+// 📱 Mobile JUMP button
+if (jumpBtn) {
+  const handleTap = (e) => {
+    e.preventDefault();
+    flap();
+  };
+  jumpBtn.addEventListener("click", handleTap);
+  jumpBtn.addEventListener("touchstart", handleTap, { passive: false });
+}
 
 resetGame();
 update();

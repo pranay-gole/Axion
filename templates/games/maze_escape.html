@@ -7,11 +7,30 @@
   <link rel="stylesheet" href="{{ url_for('static', filename='games/maze_escape/style.css') }}">
 </head>
 <body>
+
+  <!-- 🔥 Exit Gate Added -->
+  <a href="{{ url_for('dashboard') }}" class="exit-gate">
+    <span class="exit-gate-icon">⮌</span>
+    <span>Exit Gate</span>
+  </a>
+  
   <canvas id="mazeCanvas"></canvas>
 
   <div id="overlay">
     <div class="overlay-box">
       <p id="overlay-text">Press S to Start</p>
+    </div>
+  </div>
+
+  <!-- 🔻 Mobile controls (for movement) -->
+  <div class="mobile-controls">
+    <div class="mc-row mc-row-top">
+      <button class="mc-btn" id="upBtn">▲</button>
+    </div>
+    <div class="mc-row mc-row-mid">
+      <button class="mc-btn" id="leftBtn">◀</button>
+      <button class="mc-btn" id="downBtn">▼</button>
+      <button class="mc-btn" id="rightBtn">▶</button>
     </div>
   </div>
 

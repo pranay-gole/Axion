@@ -7,13 +7,23 @@
   <link rel="stylesheet" href="{{ url_for('static', filename='games/flappy/style.css') }}">
 </head>
 <body>
+
+  <!-- 🔥 Exit Gate Added -->
+  <a href="{{ url_for('dashboard') }}" class="exit-gate">
+    <span class="exit-gate-icon">⮌</span>
+    <span>Exit Gate</span>
+  </a>
+  
   <div id="game-container">
     <canvas id="gameCanvas"></canvas>
 
     <div id="ui">
       <div id="score">0</div>
-      <div id="message">Tap SPACE to start</div>
+      <div id="message">Tap or press SPACE to start</div>
       <div id="instructions">[P] Pause | [R] Restart</div>
+
+      <!-- 🔻 Mobile JUMP button -->
+      <button id="jumpBtn">JUMP</button>
     </div>
   </div>
 

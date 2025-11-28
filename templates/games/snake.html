@@ -7,12 +7,31 @@
   <link rel="stylesheet" href="{{ url_for('static', filename='games/snake/style.css') }}">
 </head>
 <body>
+
+  <!-- 🔥 Exit Gate Added -->
+  <a href="{{ url_for('dashboard') }}" class="exit-gate">
+    <span class="exit-gate-icon">⮌</span>
+    <span>Exit Gate</span>
+  </a>
+  
   <canvas id="gameCanvas"></canvas>
 
   <div class="hud">
     <h1>🐍 Cyber Snake</h1>
     <p>Score: <span id="score">0</span></p>
     <button id="restartBtn">Restart</button>
+  </div>
+
+  <!-- 🔻 On-screen controls for mobile -->
+  <div class="mobile-controls">
+    <div class="mc-row mc-row-top">
+      <button class="mc-btn" id="upBtn">▲</button>
+    </div>
+    <div class="mc-row mc-row-mid">
+      <button class="mc-btn" id="leftBtn">◀</button>
+      <button class="mc-btn" id="downBtn">▼</button>
+      <button class="mc-btn" id="rightBtn">▶</button>
+    </div>
   </div>
 
   <script src="{{ url_for('static', filename='games/snake/script.js') }}"></script>

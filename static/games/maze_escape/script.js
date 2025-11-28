@@ -166,7 +166,13 @@ function drawMaze() {
   // Goal
   ctx.fillStyle = "#ffaa00";
   ctx.beginPath();
-  ctx.arc(goal.i * cellSize + cellSize / 2, goal.j * cellSize + cellSize / 2, cellSize / 4, 0, Math.PI * 2);
+  ctx.arc(
+    goal.i * cellSize + cellSize / 2,
+    goal.j * cellSize + cellSize / 2,
+    cellSize / 4,
+    0,
+    Math.PI * 2
+  );
   ctx.fill();
 
   // Power-ups
@@ -190,7 +196,13 @@ function drawMaze() {
   ctx.shadowColor = "#ff3b3b";
   ctx.shadowBlur = 15;
   ctx.beginPath();
-  ctx.arc(player.i * cellSize + cellSize / 2, player.j * cellSize + cellSize / 2, cellSize / 3, 0, Math.PI * 2);
+  ctx.arc(
+    player.i * cellSize + cellSize / 2,
+    player.j * cellSize + cellSize / 2,
+    cellSize / 3,
+    0,
+    Math.PI * 2
+  );
   ctx.fill();
   ctx.shadowBlur = 0;
 
@@ -260,6 +272,7 @@ function movePlayer(dir) {
 function startGame() {
   overlay.style.display = "none";
   timeLeft = 30 + (level - 1) * 2;
+  gameWon = false;
   generateMaze();
   clearInterval(timerInterval);
   timerInterval = setInterval(() => {
@@ -341,3 +354,53 @@ function animate() {
 
 generateMaze();
 animate();
+
+
+// ==== 🔻 MOBILE / TOUCH CONTROLS BINDING ====
+
+(function () {
+  const upBtn = document.getElementById("upBtn");
+  const downBtn = document.getElementById("downBtn");
+  const leftBtn = document.getElementById("leftBtn");
+  const rightBtn = document.getElementById("rightBtn");
+
+  function bindDir(btn, dir) {
+    if (!btn) return;
+    const handle = (e) => {
+      e.preventDefault();
+      movePlayer(dir);
+    };
+    btn.addEventListener("click", handle);
+    btn.addEventListener("touchstart", handle, { passive: false });
+  }
+
+  bindDir(upBtn, "UP");
+  bindDir(downBtn, "DOWN");
+  bindDir(leftBtn, "LEFT");
+  bindDir(rightBtn, "RIGHT");
+
+  // 🔻 Overlay tap: Start / Next / Restart / Resume
+  function handleOverlayTap(e) {
+    if (e) e.preventDefault();
+    const txt = (overlayText.textContent || overlayText.innerText || "").toLowerCase();
+
+    if (txt.includes("start")) {
+      // "Press S to Start"
+      startGame();
+    } else if (txt.includes("level complete")) {
+      // "Level Complete! Press N for Next Level"
+      nextLevel();
+    } else if (txt.includes("time's up") || txt.includes("you win") || txt.includes("restart")) {
+      // restart from win/time-up text
+      restartGame();
+    } else if (txt.includes("pause") || txt.includes("resume")) {
+      // pause / resume
+      togglePause();
+    }
+  }
+
+  if (overlay) {
+    overlay.addEventListener("click", handleOverlayTap);
+    overlay.addEventListener("touchstart", handleOverlayTap, { passive: false });
+  }
+})();

@@ -33,9 +33,9 @@
     w: 36,
     h: 26,
     vx: 0,
-    speed: 340, // 🧠 reduced speed for smoother control
-    accel: 900, // gradual acceleration
-    decel: 700, // gradual deceleration
+    speed: 340,
+    accel: 900,
+    decel: 700,
     hp: 100,
     maxHp: 100,
     cool: 0,
@@ -59,7 +59,7 @@
 
   const keys = { left: false, right: false, fire: false };
 
-  // === Controls ===
+  // === Keyboard Controls ===
   addEventListener("keydown", (e) => {
     if (e.code === "ArrowLeft" || e.code === "KeyA") keys.left = true;
     if (e.code === "ArrowRight" || e.code === "KeyD") keys.right = true;
@@ -81,7 +81,7 @@
     }
   });
 
-  // === Touch Controls ===
+  // === Touch / Mobile Controls ===
   const bind = (id, on, off) => {
     const el = document.getElementById(id);
     if (!el) return;
@@ -98,9 +98,19 @@
       })
     );
   };
+
   bind("leftBtn", () => (keys.left = true), () => (keys.left = false));
   bind("rightBtn", () => (keys.right = true), () => (keys.right = false));
-  bind("fireBtn", () => (keys.fire = true), () => (keys.fire = false));
+
+  // 🔥 IMPORTANT: mobile FIRE se game start bhi hoga
+  bind(
+    "fireBtn",
+    () => {
+      keys.fire = true;
+      if (!running && !over) start();
+    },
+    () => (keys.fire = false)
+  );
 
   // === Core Functions ===
   function start() {
@@ -255,7 +265,6 @@
   let nextWaveAt = 0;
 
   function update(dt) {
-    // smoother acceleration
     if (keys.left) player.vx -= player.accel * dt;
     else if (keys.right) player.vx += player.accel * dt;
     else {
@@ -267,7 +276,6 @@
     player.x += player.vx * dt;
     player.x = clamp(player.x, 8, W - player.w - 8);
 
-    // shooting
     player.cool -= dt * 1000;
     if (keys.fire && player.cool <= 0) {
       shoot();
@@ -285,7 +293,6 @@
       nextWaveAt = now() + 14000;
     }
 
-    // enemies & collisions
     for (let i = foes.length - 1; i >= 0; i--) {
       const f = foes[i];
       f.y += f.speed * dt;
@@ -397,6 +404,9 @@
     if (running && !paused && !over) {
       update(dt);
       render(dt);
+    } else {
+      // even when not running, keep bg anim smooth if you want:
+      drawBG(dt);
     }
     requestAnimationFrame(loop);
   }

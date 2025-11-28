@@ -7,6 +7,13 @@
   <link rel="stylesheet" href="{{ url_for('static', filename='games/memoryflip/style.css') }}">
 </head>
 <body>
+
+  <!-- 🔥 Exit Gate Added -->
+  <a href="{{ url_for('dashboard') }}" class="exit-gate">
+    <span class="exit-gate-icon">⮌</span>
+    <span>Exit Gate</span>
+  </a>
+  
   <canvas id="particles"></canvas>
 
   <h1>Memory Flip</h1>

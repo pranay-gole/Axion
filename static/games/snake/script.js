@@ -1,7 +1,12 @@
 const canvas = document.getElementById('gameCanvas');
 const ctx = canvas.getContext('2d');
-canvas.width = window.innerWidth;
-canvas.height = window.innerHeight;
+
+function resizeCanvas() {
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+}
+resizeCanvas();
+window.addEventListener('resize', resizeCanvas);
 
 const grid = 25;
 let snake = [{ x: 5 * grid, y: 5 * grid }];
@@ -19,10 +24,24 @@ let eatCount = 0;
 const scoreDisplay = document.getElementById('score');
 const deathSound = new Audio("{{ url_for('static', filename='games/snake/death.wav') }}");
 
+// overlay element
 const overlay = document.createElement('div');
 overlay.id = "gameOverOverlay";
-overlay.textContent = "PRESS 'S' TO START";
+overlay.textContent = "PRESS 'S' OR TAP TO START";
 document.body.appendChild(overlay);
+
+// restart button
+const restartBtn = document.getElementById('restartBtn');
+if (restartBtn) {
+  restartBtn.addEventListener('click', () => {
+    if (!started || gameOver) {
+      resetGame();
+    } else {
+      // allow restart anytime
+      resetGame();
+    }
+  });
+}
 
 // === Spawn Food ===
 function spawnFood() {
@@ -173,14 +192,12 @@ function endGame() {
         color: #00ffff;
         margin-top: 24px;
         font-size: 1.1rem;
-      ">PRESS 'R' TO RESTART</p>
+      ">PRESS 'R' OR TAP RESTART</p>
     </div>
   `;
 
-  overlay.classList.add('active');
-  overlay.style.opacity = 1;
+  showOverlay();
 }
-
 
 // === Reset ===
 function resetGame() {
@@ -203,7 +220,7 @@ function togglePause() {
   if (!started || gameOver) return;
   paused = !paused;
   if (paused) {
-    overlay.textContent = "PAUSED\nPress 'P' to Resume";
+    overlay.textContent = "PAUSED\nTap or press 'P' to Resume";
     showOverlay();
   } else {
     hideOverlay();
@@ -219,11 +236,19 @@ function showOverlay() {
 
 function hideOverlay() {
   overlay.style.opacity = 0;
-  overlay.style.background = 'rgba(0,0,0,0)'; // make it fully clear again
+  overlay.style.background = 'rgba(0,0,0,0)';
   setTimeout(() => {
     overlay.classList.remove('active');
-    overlay.innerHTML = ""; // 🟢 clears styled HTML text safely
+    overlay.innerHTML = "";
   }, 500);
+}
+
+// === Direction helper (used by keys + buttons) ===
+function setDirection(dir) {
+  if (dir === 'up' && direction.y === 0) direction = { x: 0, y: -1 };
+  else if (dir === 'down' && direction.y === 0) direction = { x: 0, y: 1 };
+  else if (dir === 'left' && direction.x === 0) direction = { x: -1, y: 0 };
+  else if (dir === 'right' && direction.x === 0) direction = { x: 1, y: 0 };
 }
 
 // === Main Loop ===
@@ -240,14 +265,14 @@ function update(time) {
   requestAnimationFrame(update);
 }
 
-// === Controls ===
+// === Keyboard Controls ===
 window.addEventListener('keydown', (e) => {
   const key = e.key.toLowerCase();
 
-  if (key === 'arrowup' && direction.y === 0) direction = { x: 0, y: -1 };
-  if (key === 'arrowdown' && direction.y === 0) direction = { x: 0, y: 1 };
-  if (key === 'arrowleft' && direction.x === 0) direction = { x: -1, y: 0 };
-  if (key === 'arrowright' && direction.x === 0) direction = { x: 1, y: 0 };
+  if (key === 'arrowup') setDirection('up');
+  if (key === 'arrowdown') setDirection('down');
+  if (key === 'arrowleft') setDirection('left');
+  if (key === 'arrowright') setDirection('right');
 
   if (key === 's' && !started) {
     started = true;
@@ -258,3 +283,38 @@ window.addEventListener('keydown', (e) => {
   if (key === 'p') togglePause();
   if (key === 'r') resetGame();
 });
+
+// === Canvas tap to start (mobile) ===
+canvas.addEventListener('touchstart', (e) => {
+  e.preventDefault();
+  if (!started && !gameOver) {
+    started = true;
+    hideOverlay();
+    requestAnimationFrame(update);
+  }
+}, { passive: false });
+
+canvas.addEventListener('pointerdown', (e) => {
+  if (!started && !gameOver) {
+    started = true;
+    hideOverlay();
+    requestAnimationFrame(update);
+  }
+});
+
+// === Mobile Buttons Bind ===
+function bindBtn(id, dir) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  const handler = (e) => {
+    e.preventDefault();
+    setDirection(dir);
+  };
+  el.addEventListener('touchstart', handler, { passive: false });
+  el.addEventListener('pointerdown', handler);
+}
+
+bindBtn('upBtn', 'up');
+bindBtn('downBtn', 'down');
+bindBtn('leftBtn', 'left');
+bindBtn('rightBtn', 'right');

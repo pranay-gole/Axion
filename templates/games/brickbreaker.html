@@ -7,10 +7,27 @@
   <link rel="stylesheet" href="{{ url_for('static', filename='games/brickbreaker/style.css') }}">
 </head>
 <body>
+
+  <!-- 🔥 Exit Gate Added -->
+  <a href="{{ url_for('dashboard') }}" class="exit-gate">
+    <span class="exit-gate-icon">⮌</span>
+    <span>Exit Gate</span>
+  </a>
+
   <canvas id="brickCanvas"></canvas>
+
   <div id="overlay">
-    <p id="overlay-text">Press S to Start</p>
+    <p id="overlay-text">Press S or Tap to Start</p>
   </div>
+
+  <!-- 🔻 Mobile controls -->
+  <div class="mobile-controls">
+    <div class="mobile-controls-inner">
+      <button class="mc-btn" id="leftBtn">◀</button>
+      <button class="mc-btn" id="rightBtn">▶</button>
+    </div>
+  </div>
+
   <script src="{{ url_for('static', filename='games/brickbreaker/script.js') }}"></script>
 </body>
 </html>

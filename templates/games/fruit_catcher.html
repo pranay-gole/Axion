@@ -7,11 +7,26 @@
   <link rel="stylesheet" href="{{ url_for('static', filename='games/fruit_catcher/style.css') }}">
 </head>
 <body>
+
+  <!-- 🔥 Exit Gate Added -->
+  <a href="{{ url_for('dashboard') }}" class="exit-gate">
+    <span class="exit-gate-icon">⮌</span>
+    <span>Exit Gate</span>
+  </a>
+  
   <canvas id="gameCanvas"></canvas>
 
   <div id="overlay">
     <div class="overlay-box">
       <p id="overlay-text">Press S to Start</p>
+    </div>
+  </div>
+
+  <!-- 🔻 Mobile controls (left/right) -->
+  <div class="mobile-controls">
+    <div class="mobile-controls-inner">
+      <button class="mc-btn" id="leftBtn">◀</button>
+      <button class="mc-btn" id="rightBtn">▶</button>
     </div>
   </div>
 
