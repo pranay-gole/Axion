@@ -4,6 +4,30 @@ import os
 from werkzeug.security import generate_password_hash, check_password_hash
 from datetime import timedelta
 
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+DB_PATH = os.path.join(BASE_DIR, "database", "usersdata.db")
+
+if not os.path.exists(os.path.join(BASE_DIR, "database")):
+    os.makedirs(os.path.join(BASE_DIR, "database"))
+
+if not os.path.exists(DB_PATH):
+    conn = sqlite3.connect(DB_PATH)
+    c = conn.cursor()
+    c.execute("""
+        CREATE TABLE IF NOT EXISTS users (
+            username TEXT PRIMARY KEY,
+            password TEXT,
+            email TEXT,
+            avatar TEXT,
+            bio TEXT,
+            dob TEXT,
+            exp INTEGER DEFAULT 0,
+            is_admin INTEGER DEFAULT 0
+        )
+    """)
+    conn.commit()
+    conn.close()
+
 app = Flask(__name__)
 app.secret_key = "your_secret_key"  # Replace with a secure key
 
@@ -31,7 +55,7 @@ def register():
         username = request.form["username"]
         password = request.form["password"]
 
-        conn = sqlite3.connect("database/usersdata.db")
+        conn = sqlite3.connect(DB_PATH)
         c = conn.cursor()
 
         # Check if user already exists
@@ -124,7 +148,7 @@ def dashboard():
 # -----------------------
 def add_exp(username, amount=10):
     """Adds XP to the given user."""
-    conn = sqlite3.connect("database/usersdata.db")
+    conn = sqlite3.connect(DB_PATH)
     c = conn.cursor()
     c.execute("UPDATE users SET exp = exp + ? WHERE username=?", (amount, username))
     conn.commit()
@@ -148,7 +172,7 @@ def profile():
     if "username" not in session:
         return redirect(url_for("login"))
 
-    conn = sqlite3.connect("database/usersdata.db")
+    conn = sqlite3.connect(DB_PATH)
     c = conn.cursor()
     c.execute("SELECT exp FROM users WHERE username=?", (session["username"],))
     result = c.fetchone()
@@ -178,7 +202,7 @@ def update_avatar():
 
     avatar = request.form.get("avatar")
 
-    conn = sqlite3.connect("database/usersdata.db")
+    conn = sqlite3.connect(DB_PATH)
     c = conn.cursor()
     c.execute("UPDATE users SET avatar=? WHERE username=?", (avatar, session["username"]))
     conn.commit()
@@ -200,7 +224,7 @@ def update_profile():
     dob = request.form.get("dob")
     bio = request.form.get("bio")
 
-    conn = sqlite3.connect("database/usersdata.db")
+    conn = sqlite3.connect(DB_PATH)
     c = conn.cursor()
     c.execute("""
         UPDATE users
@@ -229,7 +253,7 @@ def admin_panel():
     if session.get("is_admin") != 1:
         return "<h2>Access Denied 🚫</h2><p>You are not authorized to view this page.</p>"
 
-    conn = sqlite3.connect("database/usersdata.db")
+    conn = sqlite3.connect(DB_PATH)
     c = conn.cursor()
     c.execute("SELECT username, email, dob, exp FROM users")
     users = c.fetchall()
@@ -245,7 +269,7 @@ def leaderboard():
     if "username" not in session:
         return redirect(url_for("login"))
 
-    conn = sqlite3.connect("database/usersdata.db")
+    conn = sqlite3.connect(DB_PATH)
     cursor = conn.cursor()
 
     cursor.execute("SELECT username, exp FROM users ORDER BY exp DESC")
@@ -345,4 +369,4 @@ def runner():
 if __name__ == "__main__":
     import os
     port = int(os.environ.get("PORT", 10000))
-    app.run(host="0.0.0.0", port=port, debug=True)
+    app.run(host="0.0.0.0", port=port)
