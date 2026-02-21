@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Axion Runner</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <link rel="stylesheet" 
+        href="{{ url_for('static', filename='games/runner/style.css') }}">
+</head>
+
+<body>
+
+  <a href="{{ url_for('dashboard') }}" class="back">← Exit</a>
+
+  <!-- Theme Button -->
+  <button id="themeBtn" class="theme-btn">🌙 Toggle Theme</button>
+  
+  <!-- Game Canvas -->
+  <canvas id="gameCanvas"></canvas>
+
+  <!-- UI -->
+  <div class="ui">
+    <div>Score: <span id="score">0</span></div>
+    <div>Best: <span id="bestScore">0</span></div>
+    <div id="message">Press SPACE or Tap to Jump</div>
+  </div>
+
+  <script src="{{ url_for('static', filename='games/runner/script.js') }}"></script>
+
+</body>
+</html>

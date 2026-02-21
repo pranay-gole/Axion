@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Leaderboard - Axion</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600&display=swap" rel="stylesheet">
+    <style>
+        body {
+            background: linear-gradient(to bottom, #050510, #101020);
+            font-family: 'Orbitron', sans-serif;
+            color: white;
+            text-align: center;
+            margin: 0;
+        }
+
+        h1 {
+            margin-top: 40px;
+            color: #00fff7;
+        }
+
+        .leaderboard {
+            width: 90%;
+            max-width: 800px;
+            margin: 40px auto;
+        }
+
+        .row {
+            display: flex;
+            justify-content: space-between;
+            padding: 15px 20px;
+            margin: 10px 0;
+            border-radius: 10px;
+            background: rgba(0,0,0,0.4);
+            box-shadow: 0 0 10px #00fff755;
+        }
+
+        .top1 { background: gold; color: black; }
+        .top2 { background: silver; color: black; }
+        .top3 { background: #cd7f32; color: black; }
+
+        .rank { font-weight: bold; }
+
+        .back-btn {
+            display: inline-block;
+            margin-top: 30px;
+            padding: 10px 20px;
+            border: 2px solid #00fff7;
+            color: #00fff7;
+            text-decoration: none;
+            border-radius: 6px;
+        }
+
+        .back-btn:hover {
+            background: #00fff7;
+            color: black;
+        }
+    </style>
+</head>
+<body>
+
+<h1>🏆 Global Leaderboard</h1>
+
+<div class="leaderboard">
+    {% for user in users %}
+        <div class="row 
+            {% if user.rank == 1 %}top1{% endif %}
+            {% if user.rank == 2 %}top2{% endif %}
+            {% if user.rank == 3 %}top3{% endif %}">
+            
+            <div class="rank">#{{ user.rank }}</div>
+            <div>{{ user.username }}</div>
+            <div>Level {{ user.level }}</div>
+            <div>{{ user.exp }} XP</div>
+        </div>
+    {% endfor %}
+</div>
+
+<a href="{{ url_for('dashboard') }}" class="back-btn">⬅ Back to Dashboard</a>
+
+</body>
+</html>
