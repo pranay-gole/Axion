@@ -109,6 +109,14 @@ canvas {
   box-shadow: 0 0 24px rgba(0, 255, 247, 0.9);
 }
 
+body {
+    background: #000000 !important;
+}
+
+canvas {
+    background: #000000 !important;
+}
+
 /* mobile pe thoda chhota */
 @media (max-width: 768px) {
   .exit-gate {
@@ -125,3 +133,4 @@ canvas {
     display: block;
   }
 }
+
