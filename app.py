@@ -293,12 +293,6 @@ def leaderboard():
 # -----------------------
 # Games (add XP)
 # -----------------------
-@app.route("/tictactoe")
-def tictactoe():
-    if "username" not in session:
-        return redirect(url_for("login"))
-    add_exp(session["username"], 10)
-    return render_template("games/tictactoe.html")
 
 
 @app.route('/memory')
