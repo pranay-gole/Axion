@@ -318,7 +318,7 @@ def fruitcatcher():
     if "username" not in session:
         return redirect(url_for("login"))
     add_exp(session["username"], 15)
-    return render_template('games/fruitcatcher.html')
+    return render_template('games/fruit_catcher.html')
 
 @app.route('/maze_escape')
 def maze_escape():
