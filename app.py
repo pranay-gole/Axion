@@ -1,38 +1,17 @@
 from flask import Flask, render_template, request, redirect, url_for, session
-import sqlite3
+import psycopg2
 import os
 from werkzeug.security import generate_password_hash, check_password_hash
 from datetime import timedelta
 
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-DB_PATH = os.path.join(BASE_DIR, "database", "usersdata.db")
-
-if not os.path.exists(os.path.join(BASE_DIR, "database")):
-    os.makedirs(os.path.join(BASE_DIR, "database"))
-
-if not os.path.exists(DB_PATH):
-    conn = sqlite3.connect(DB_PATH)
-    c = conn.cursor()
-    c.execute("""
-        CREATE TABLE IF NOT EXISTS users (
-            username TEXT PRIMARY KEY,
-            password TEXT,
-            email TEXT,
-            avatar TEXT,
-            bio TEXT,
-            dob TEXT,
-            exp INTEGER DEFAULT 0,
-            is_admin INTEGER DEFAULT 0
-        )
-    """)
-    conn.commit()
-    conn.close()
-
 app = Flask(__name__)
-app.secret_key = "your_secret_key"  # Replace with a secure key
-
 app.secret_key = "super_secret_key_123"
 app.permanent_session_lifetime = timedelta(days=7)
+
+# PostgreSQL connection
+def get_db_connection():
+    conn = psycopg2.connect(os.environ.get("DATABASE_URL"))
+    return conn
 
 # -----------------------
 # Home Page
@@ -55,18 +34,18 @@ def register():
         username = request.form["username"]
         password = request.form["password"]
 
-        conn = sqlite3.connect(DB_PATH)
+        conn = get_db_connection()
         c = conn.cursor()
 
         # Check if user already exists
-        c.execute("SELECT * FROM users WHERE username=?", (username,))
+        c.execute("SELECT * FROM users WHERE username=%s", (username,))
         if c.fetchone():
             conn.close()
             return "Username already exists."
 
         # Hash the password before saving
         hashed_password = generate_password_hash(password)
-        c.execute("INSERT INTO users (username, password) VALUES (?, ?)", (username, hashed_password))
+        c.execute("INSERT INTO users (username, password) VALUES (%s, %s)", (username, hashed_password))
         conn.commit()
         conn.close()
 
@@ -93,7 +72,7 @@ def login():
         try:
             conn = sqlite3.connect(db_path)
             c = conn.cursor()
-            c.execute("SELECT username, password, email, avatar, bio, dob, exp, is_admin FROM users WHERE username=?", (username,))
+            c.execute("SELECT username, password, email, avatar, bio, dob, exp, is_admin FROM users WHERE username=%s", (username,))
             user = c.fetchone()
             conn.close()
         except Exception as e:
@@ -148,9 +127,9 @@ def dashboard():
 # -----------------------
 def add_exp(username, amount=10):
     """Adds XP to the given user."""
-    conn = sqlite3.connect(DB_PATH)
+    conn = get_db_connection()
     c = conn.cursor()
-    c.execute("UPDATE users SET exp = exp + ? WHERE username=?", (amount, username))
+    c.execute("UPDATE users SET exp = exp + %s WHERE username=%s", (amount, username))
     conn.commit()
     conn.close()
 
@@ -172,9 +151,9 @@ def profile():
     if "username" not in session:
         return redirect(url_for("login"))
 
-    conn = sqlite3.connect(DB_PATH)
+    conn = get_db_connection()
     c = conn.cursor()
-    c.execute("SELECT exp FROM users WHERE username=?", (session["username"],))
+    c.execute("SELECT exp FROM users WHERE username=%s", (session["username"],))
     result = c.fetchone()
     conn.close()
 
@@ -202,9 +181,9 @@ def update_avatar():
 
     avatar = request.form.get("avatar")
 
-    conn = sqlite3.connect(DB_PATH)
+    conn = get_db_connection()
     c = conn.cursor()
-    c.execute("UPDATE users SET avatar=? WHERE username=?", (avatar, session["username"]))
+    c.execute("UPDATE users SET avatar=%s WHERE username=%s", (avatar, session["username"]))
     conn.commit()
     conn.close()
 
@@ -224,12 +203,12 @@ def update_profile():
     dob = request.form.get("dob")
     bio = request.form.get("bio")
 
-    conn = sqlite3.connect(DB_PATH)
+    conn = get_db_connection()
     c = conn.cursor()
     c.execute("""
         UPDATE users
-        SET email=?, dob=?, bio=?
-        WHERE username=?
+        SET email=%s, dob=%s, bio=%s
+        WHERE username=%s
     """, (email, dob, bio, session["username"]))
     conn.commit()
     conn.close()
@@ -269,7 +248,7 @@ def leaderboard():
     if "username" not in session:
         return redirect(url_for("login"))
 
-    conn = sqlite3.connect(DB_PATH)
+    conn = get_db_connection()
     cursor = conn.cursor()
 
     cursor.execute("SELECT username, exp FROM users ORDER BY exp DESC")
@@ -289,6 +268,30 @@ def leaderboard():
         })
 
     return render_template("leaderboard.html", users=ranked_users)
+
+@app.route("/initdb")
+def initdb():
+    conn = get_db_connection()
+    cur = conn.cursor()
+
+    cur.execute("""
+        CREATE TABLE IF NOT EXISTS users (
+            username TEXT PRIMARY KEY,
+            password TEXT,
+            email TEXT,
+            avatar TEXT,
+            bio TEXT,
+            dob TEXT,
+            exp INTEGER DEFAULT 0,
+            is_admin INTEGER DEFAULT 0
+        )
+    """)
+
+    conn.commit()
+    cur.close()
+    conn.close()
+
+    return "Database initialized!"
 
 # -----------------------
 # Games (add XP)
