@@ -10,8 +10,12 @@ app.permanent_session_lifetime = timedelta(days=7)
 
 # PostgreSQL connection
 def get_db_connection():
-    conn = psycopg2.connect(os.environ.get("DATABASE_URL"))
+    conn = psycopg2.connect(
+        os.environ.get("DATABASE_URL"),
+        sslmode="require"
+    )
     return conn
+
 
 # -----------------------
 # Home Page
@@ -22,12 +26,11 @@ def home():
 
 
 # -----------------------
-# Register Page (with password hashing)
+# Register Page
 # -----------------------
 @app.route("/register", methods=["GET", "POST"])
 def register():
     if "username" in session:
-        # Already logged in users should not access register page
         return redirect(url_for("dashboard"))
     
     if request.method == "POST":
@@ -35,17 +38,20 @@ def register():
         password = request.form["password"]
 
         conn = get_db_connection()
-        c = conn.cursor()
+        cur = conn.cursor()
 
-        # Check if user already exists
-        c.execute("SELECT * FROM users WHERE username=%s", (username,))
-        if c.fetchone():
+        cur.execute("SELECT * FROM users WHERE username=%s", (username,))
+        if cur.fetchone():
             conn.close()
             return "Username already exists."
 
-        # Hash the password before saving
         hashed_password = generate_password_hash(password)
-        c.execute("INSERT INTO users (username, password) VALUES (%s, %s)", (username, hashed_password))
+
+        cur.execute(
+            "INSERT INTO users (username, password) VALUES (%s, %s)",
+            (username, hashed_password)
+        )
+
         conn.commit()
         conn.close()
 
@@ -59,7 +65,7 @@ def register():
 # -----------------------
 @app.route("/login", methods=["GET", "POST"])
 def login():
-    # If already logged in, skip login
+
     if "username" in session:
         return redirect(url_for("dashboard"))
 
@@ -67,14 +73,19 @@ def login():
         username = request.form.get("username", "").strip()
         password = request.form.get("password", "")
 
-        db_path = os.path.join(os.path.dirname(__file__), "database", "usersdata.db")
-
         try:
-            conn = sqlite3.connect(db_path)
-            c = conn.cursor()
-            c.execute("SELECT username, password, email, avatar, bio, dob, exp, is_admin FROM users WHERE username=%s", (username,))
-            user = c.fetchone()
+            conn = get_db_connection()
+            cur = conn.cursor()
+
+            cur.execute("""
+                SELECT username, password, email, avatar, bio, dob, exp, is_admin
+                FROM users
+                WHERE username=%s
+            """, (username,))
+
+            user = cur.fetchone()
             conn.close()
+
         except Exception as e:
             print("❌ Database error:", e)
             return render_template("login.html", error="Database connection failed")
@@ -91,7 +102,6 @@ def login():
         if valid:
             session.clear()
             session.permanent = True
-            app.permanent_session_lifetime = timedelta(days=7)
 
             session["username"] = user[0]
             session["email"] = user[2]
@@ -101,35 +111,30 @@ def login():
             session["exp"] = user[6]
             session["is_admin"] = 1 if user[7] == 1 else 0
 
-            print(f"✅ Login success for {username}")
             return redirect(url_for("dashboard"))
         else:
-            print(f"❌ Invalid credentials for: {username}")
-            # ⚠️ Only this line added for showing error on login page
             return render_template("login.html", error="❌ User not found or password incorrect.")
 
     return render_template("login.html")
 
 
 # -----------------------
-# Dashboard Page
+# Dashboard
 # -----------------------
 @app.route("/dashboard")
 def dashboard():
     if "username" in session:
         return render_template("dashboard.html", username=session["username"])
-    else:
-        return redirect(url_for("login"))
+    return redirect(url_for("login"))
 
 
 # -----------------------
-# Add XP Function
+# Add XP
 # -----------------------
 def add_exp(username, amount=10):
-    """Adds XP to the given user."""
     conn = get_db_connection()
-    c = conn.cursor()
-    c.execute("UPDATE users SET exp = exp + %s WHERE username=%s", (amount, username))
+    cur = conn.cursor()
+    cur.execute("UPDATE users SET exp = exp + %s WHERE username=%s", (amount, username))
     conn.commit()
     conn.close()
 
@@ -144,7 +149,7 @@ def logout():
 
 
 # -----------------------
-# Profile Page
+# Profile
 # -----------------------
 @app.route("/profile")
 def profile():
@@ -152,24 +157,25 @@ def profile():
         return redirect(url_for("login"))
 
     conn = get_db_connection()
-    c = conn.cursor()
-    c.execute("SELECT exp FROM users WHERE username=%s", (session["username"],))
-    result = c.fetchone()
+    cur = conn.cursor()
+
+    cur.execute("SELECT exp FROM users WHERE username=%s", (session["username"],))
+    result = cur.fetchone()
     conn.close()
 
     exp = result[0] if result else 0
 
     level = (exp // 100) + 1
     current_xp = exp % 100
-    progress_percent = current_xp
 
     return render_template(
         "profile.html",
         level=level,
         exp=exp,
         current_xp=current_xp,
-        progress_percent=progress_percent
+        progress_percent=current_xp
     )
+
 
 # -----------------------
 # Update Avatar
@@ -182,12 +188,12 @@ def update_avatar():
     avatar = request.form.get("avatar")
 
     conn = get_db_connection()
-    c = conn.cursor()
-    c.execute("UPDATE users SET avatar=%s WHERE username=%s", (avatar, session["username"]))
+    cur = conn.cursor()
+    cur.execute("UPDATE users SET avatar=%s WHERE username=%s", (avatar, session["username"]))
     conn.commit()
     conn.close()
 
-    session["avatar"] = avatar  # update session
+    session["avatar"] = avatar
     return redirect(url_for("profile"))
 
 
@@ -204,16 +210,17 @@ def update_profile():
     bio = request.form.get("bio")
 
     conn = get_db_connection()
-    c = conn.cursor()
-    c.execute("""
+    cur = conn.cursor()
+
+    cur.execute("""
         UPDATE users
         SET email=%s, dob=%s, bio=%s
         WHERE username=%s
     """, (email, dob, bio, session["username"]))
+
     conn.commit()
     conn.close()
 
-    # update session data
     session["email"] = email
     session["dob"] = dob
     session["bio"] = bio
@@ -222,7 +229,7 @@ def update_profile():
 
 
 # -----------------------
-# Admin Panel (Protected)
+# Admin Panel
 # -----------------------
 @app.route("/admin")
 def admin_panel():
@@ -230,15 +237,16 @@ def admin_panel():
         return redirect(url_for("login"))
 
     if session.get("is_admin") != 1:
-        return "<h2>Access Denied 🚫</h2><p>You are not authorized to view this page.</p>"
+        return "<h2>Access Denied 🚫</h2>"
 
-    conn = sqlite3.connect(DB_PATH)
-    c = conn.cursor()
-    c.execute("SELECT username, email, dob, exp FROM users")
-    users = c.fetchall()
+    conn = get_db_connection()
+    cur = conn.cursor()
+    cur.execute("SELECT username, email, dob, exp FROM users")
+    users = cur.fetchall()
     conn.close()
 
     return render_template("admin.html", users=users)
+
 
 # -----------------------
 # Leaderboard
@@ -249,11 +257,9 @@ def leaderboard():
         return redirect(url_for("login"))
 
     conn = get_db_connection()
-    cursor = conn.cursor()
-
-    cursor.execute("SELECT username, exp FROM users ORDER BY exp DESC")
-    users = cursor.fetchall()
-
+    cur = conn.cursor()
+    cur.execute("SELECT username, exp FROM users ORDER BY exp DESC")
+    users = cur.fetchall()
     conn.close()
 
     ranked_users = []
@@ -269,6 +275,10 @@ def leaderboard():
 
     return render_template("leaderboard.html", users=ranked_users)
 
+
+# -----------------------
+# Init DB (Run once)
+# -----------------------
 @app.route("/initdb")
 def initdb():
     conn = get_db_connection()
@@ -288,87 +298,14 @@ def initdb():
     """)
 
     conn.commit()
-    cur.close()
     conn.close()
 
     return "Database initialized!"
 
-# -----------------------
-# Games (add XP)
-# -----------------------
-
-
-@app.route('/memory')
-def memory():
-    if "username" not in session:
-        return redirect(url_for("login"))
-
-    add_exp(session["username"], 10)
-
-    return render_template(
-        'games/memory.html',
-        username=session["username"]
-    )
-
-
-@app.route('/snake')
-def snake():
-    if "username" not in session:
-        return redirect(url_for("login"))
-    add_exp(session["username"], 10)
-    return render_template('games/snake.html')
-
-
-@app.route('/brickbreaker')
-def brickbreaker():
-    if "username" not in session:
-        return redirect(url_for("login"))
-    add_exp(session["username"], 10)
-    return render_template('games/brickbreaker.html')
-
-
-@app.route('/games/space-shooter')
-def space_shooter():
-    if "username" not in session:
-        return redirect(url_for("login"))
-    add_exp(session["username"], 10)
-    return render_template('games/space_shooter.html')
-
-
-@app.route('/maze_escape')
-def maze_escape():
-    if "username" not in session:
-        return redirect(url_for("login"))
-    add_exp(session["username"], 10)
-    return render_template('games/maze_escape.html')
-
-
-@app.route("/fruitcatcher")
-def fruitcatcher():
-    if "username" not in session:
-        return redirect(url_for("login"))
-    add_exp(session["username"], 10)
-    return render_template("games/fruit_catcher.html")
-
-
-@app.route('/flappy')
-def flappy():
-    if "username" not in session:
-        return redirect(url_for("login"))
-    add_exp(session["username"], 10)
-    return render_template('games/flappy.html')
-
-@app.route('/runner')
-def runner():
-    if "username" not in session:
-        return redirect(url_for("login"))
-    add_exp(session["username"], 15)
-    return render_template('games/runner.html')
 
 # -----------------------
-# Run App (Render-ready)
+# Run
 # -----------------------
 if __name__ == "__main__":
-    import os
     port = int(os.environ.get("PORT", 10000))
     app.run(host="0.0.0.0", port=port, debug=True)
