@@ -299,8 +299,13 @@ def leaderboard():
 def memory():
     if "username" not in session:
         return redirect(url_for("login"))
+
     add_exp(session["username"], 10)
-    return render_template('games/memory.html')
+
+    return render_template(
+        'games/memory.html',
+        username=session["username"]
+    )
 
 
 @app.route('/snake')
@@ -363,4 +368,4 @@ def runner():
 if __name__ == "__main__":
     import os
     port = int(os.environ.get("PORT", 10000))
-    app.run(host="0.0.0.0", port=port)
+    app.run(host="0.0.0.0", port=port, debug=True)

@@ -81,37 +81,6 @@
     }
   });
 
-  // === Touch / Mobile Controls ===
-  const bind = (id, on, off) => {
-    const el = document.getElementById(id);
-    if (!el) return;
-    ["pointerdown", "touchstart"].forEach((t) =>
-      el.addEventListener(t, (e) => {
-        e.preventDefault();
-        on();
-      })
-    );
-    ["pointerup", "touchend", "mouseleave"].forEach((t) =>
-      el.addEventListener(t, (e) => {
-        e.preventDefault();
-        off();
-      })
-    );
-  };
-
-  bind("leftBtn", () => (keys.left = true), () => (keys.left = false));
-  bind("rightBtn", () => (keys.right = true), () => (keys.right = false));
-
-  // 🔥 IMPORTANT: mobile FIRE se game start bhi hoga
-  bind(
-    "fireBtn",
-    () => {
-      keys.fire = true;
-      if (!running && !over) start();
-    },
-    () => (keys.fire = false)
-  );
-
   // === Core Functions ===
   function start() {
     running = true;

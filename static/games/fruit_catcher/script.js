@@ -8,14 +8,6 @@ const ctx = canvas.getContext("2d");
 // 🎮 Fixed game box
 canvas.width = 800;
 canvas.height = 500;
-canvas.style.position = "absolute";
-canvas.style.left = "50%";
-canvas.style.top = "50%";
-canvas.style.transform = "translate(-50%, -50%)";
-canvas.style.border = "3px solid #00ffff";
-canvas.style.borderRadius = "12px";
-canvas.style.boxShadow = "0 0 25px rgba(0,255,255,0.3)";
-canvas.style.background = "linear-gradient(to bottom, #0a0a0a, #1b1b1b)";
 
 let basket = {
   x: canvas.width / 2 - 50,
@@ -96,7 +88,7 @@ function spawnFruit() {
   let fruit;
 
   // 💣 Higher bomb probability
-  if (roll < 0.15 + level * 0.01) fruit = { emoji: "💣", type: "bomb" };
+  if (roll < 0.15 + level * 0.015) fruit = { emoji: "💣", type: "bomb" };
   else if (roll < 0.20 && level >= 2) fruit = { emoji: "⭐", type: "powerup" };
   else fruit = fruitTypes[Math.floor(Math.random() * 4)];
 
@@ -152,34 +144,34 @@ function update() {
   }
 }
 
-// 🌟 Level up display
 function showLevelUp() {
-  overlayText.style.color = "#00ffff";
-  overlayText.textContent = `🌟 Level ${level} - Faster Fruits!`;
-  overlay.style.display = "flex";
+  overlayText.innerHTML = `
+    <div class="overlay-title" style="color:#00ffff;">
+      LEVEL ${level}
+    </div>
+  `;
+
+  overlay.classList.remove("hidden");
+
   setTimeout(() => {
-    if (gameRunning && !paused) overlay.style.display = "none";
+    if (gameRunning && !paused) {
+      overlay.classList.add("hidden");
+    }
   }, 800);
 }
 
-// 💣 Bomb loss – show final score + level
 function triggerBombLose() {
   gameRunning = false;
   clearTimeout(spawnInterval);
-  overlay.style.display = "flex";
-  overlayText.style.color = "red";
+
   overlayText.innerHTML = `
-    💥 YOU LOST<br><br>
-    <span style="color:#00ffff; font-size:1.2rem;">
-      Final Score: ${score}
-    </span><br>
-    <span style="color:#ffaa00; font-size:1rem;">
-      Level Reached: ${level}
-    </span><br><br>
-    <span style="font-size:0.95rem; color:#ffffff;">
-      Press R to Restart
-    </span>
+    <div class="overlay-title">GAME OVER</div>
+    <div>Final Score: ${score}</div>
+    <div>Level Reached: ${level}</div>
+    <div class="overlay-sub">Press <b>R</b> to Restart</div>
   `;
+
+  overlay.classList.remove("hidden");
 }
 
 // 🍊 Faster spawn loop
@@ -204,29 +196,37 @@ document.addEventListener("keyup", (e) => {
   if (e.key === "ArrowRight" || e.key === "d") basket.movingRight = false;
 });
 
-// 🕹️ Pause / Resume
 function togglePause() {
   if (!gameRunning) return;
+
   paused = !paused;
-  overlayText.style.color = "#00ffff";
-  overlayText.textContent = paused ? "⏸️ Game Paused! Press P to Resume" : "";
-  overlay.style.display = paused ? "flex" : "none";
+
+  if (paused) {
+    overlayText.innerHTML = `
+      <div class="overlay-title" style="color:#ffaa00;">PAUSED</div>
+      Press <b>P</b> to Resume
+    `;
+    overlay.classList.remove("hidden");
+  } else {
+    overlay.classList.add("hidden");
+  }
 }
 
-// ▶ Start game
 function startGame() {
   if (gameRunning) return;
-  overlay.style.display = "none";
+
   score = 0;
   level = 1;
   fruitSpeed = 3.2;
   fruits = [];
-  gameRunning = true;
   paused = false;
+  gameRunning = true;
+
+  overlay.classList.add("hidden");
+
   spawnLoop();
 }
 
-// 🔁 Restart game
 function restartGame() {
   score = 0;
   level = 1;
@@ -234,9 +234,14 @@ function restartGame() {
   fruits = [];
   paused = false;
   gameRunning = false;
-  overlayText.style.color = "#00ffff";
-  overlayText.innerHTML = "Press S to Start";
-  overlay.style.display = "flex";
+
+  overlayText.innerHTML = `
+    <div class="overlay-title" style="color:#00ffff;"</div>
+    Press <b>S</b> to Start
+    </div>
+  `;
+
+  overlay.classList.remove("hidden");
 }
 
 // ⚡ Animate
@@ -245,7 +250,11 @@ function animate() {
   requestAnimationFrame(animate);
 }
 
-// initial screen
-overlayText.innerHTML = "Press S to Start";
-overlay.style.display = "flex";
+overlayText.innerHTML = `
+  <div class="overlay-title" style="color:#00ffff;">
+  Press <b>S</b> to Start
+  </div>
+`;
+
+overlay.classList.remove("hidden");
 animate();

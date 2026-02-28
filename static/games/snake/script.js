@@ -22,26 +22,7 @@ let speed = baseSpeed;
 let eatCount = 0;
 
 const scoreDisplay = document.getElementById('score');
-const deathSound = new Audio("{{ url_for('static', filename='games/snake/death.wav') }}");
-
-// overlay element
-const overlay = document.createElement('div');
-overlay.id = "gameOverOverlay";
-overlay.textContent = "PRESS 'S' OR TAP TO START";
-document.body.appendChild(overlay);
-
-// restart button
-const restartBtn = document.getElementById('restartBtn');
-if (restartBtn) {
-  restartBtn.addEventListener('click', () => {
-    if (!started || gameOver) {
-      resetGame();
-    } else {
-      // allow restart anytime
-      resetGame();
-    }
-  });
-}
+const deathSound = new Audio("/static/games/snake/death.wav");
 
 // === Spawn Food ===
 function spawnFood() {
@@ -72,7 +53,6 @@ function drawSnake() {
   drawSnakeHead();
 }
 
-// === Draw snake head with eyes + tongue ===
 function drawSnakeHead() {
   const head = snake[0];
   const centerX = head.x + grid / 2;
@@ -110,7 +90,7 @@ function drawSnakeHead() {
   ctx.arc(eyeX1, eyeY1, 1.5, 0, Math.PI * 2);
   ctx.arc(eyeX2, eyeY2, 1.5, 0, Math.PI * 2);
   ctx.fill();
-
+  
   // Tongue flicker
   if (Math.random() > 0.5) {
     ctx.strokeStyle = '#ff4d4d';
@@ -133,6 +113,7 @@ function drawSnakeHead() {
   }
 }
 
+
 // === Draw Food ===
 function drawFood() {
   ctx.fillStyle = '#ff9d4d';
@@ -144,12 +125,42 @@ function drawFood() {
   ctx.shadowBlur = 0;
 }
 
+function drawGameOver() {
+
+  ctx.fillStyle = "rgba(0,0,0,0.7)";
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+  ctx.save();
+  ctx.textAlign = "center";
+
+  ctx.font = "bold 90px Arial";
+  ctx.fillStyle = "#ff4444";
+
+  ctx.fillText("GAME OVER", canvas.width / 2, canvas.height / 2 - 40);
+
+  ctx.shadowBlur = 0;
+  ctx.fillStyle = "#00ffff";
+  ctx.font = "36px Arial";
+
+  ctx.fillText("Score: " + score, canvas.width / 2, canvas.height / 2 + 20);
+  ctx.fillText("Press R to Restart", canvas.width / 2, canvas.height / 2 + 70);
+
+  ctx.restore();
+}
+
 // === Movement + Growth ===
 function moveSnake() {
-  const head = { x: snake[0].x + direction.x * grid, y: snake[0].y + direction.y * grid };
+  const head = {
+    x: snake[0].x + direction.x * grid,
+    y: snake[0].y + direction.y * grid
+  };
 
-  if (head.x < 0 || head.y < 0 || head.x >= canvas.width || head.y >= canvas.height) return endGame();
-  for (let i = 1; i < snake.length; i++) if (head.x === snake[i].x && head.y === snake[i].y) return endGame();
+  if (head.x < 0 || head.y < 0 || head.x >= canvas.width || head.y >= canvas.height)
+    return endGame();
+
+  for (let i = 1; i < snake.length; i++)
+    if (head.x === snake[i].x && head.y === snake[i].y)
+      return endGame();
 
   snake.unshift(head);
 
@@ -167,39 +178,8 @@ function moveSnake() {
 function endGame() {
   gameOver = true;
   deathSound.play();
-
-  overlay.innerHTML = `
-    <div style="
-      background: rgba(10, 10, 15, 0.85);
-      border: 2px solid #ff4d4d;
-      border-radius: 12px;
-      padding: 40px 80px;
-      text-align: center;
-      box-shadow: 0 0 20px rgba(255, 77, 77, 0.3);
-    ">
-      <h1 style="
-        margin: 0;
-        color: #ff4d4d;
-        font-family: 'Orbitron', sans-serif;
-        font-size: 3rem;
-      ">GAME OVER 💀</h1>
-      <p style="
-        color: #ff9d4d;
-        margin-top: 12px;
-        font-size: 1.3rem;
-      ">YOU LOSE</p>
-      <p style="
-        color: #00ffff;
-        margin-top: 24px;
-        font-size: 1.1rem;
-      ">PRESS 'R' OR TAP RESTART</p>
-    </div>
-  `;
-
-  showOverlay();
 }
 
-// === Reset ===
 function resetGame() {
   snake = [{ x: 5 * grid, y: 5 * grid }];
   direction = { x: 1, y: 0 };
@@ -211,61 +191,70 @@ function resetGame() {
   gameOver = false;
   paused = false;
   started = true;
-  hideOverlay();
   requestAnimationFrame(update);
 }
 
-// === Pause ===
 function togglePause() {
+
   if (!started || gameOver) return;
   paused = !paused;
-  if (paused) {
-    overlay.textContent = "PAUSED\nTap or press 'P' to Resume";
-    showOverlay();
-  } else {
-    hideOverlay();
-    requestAnimationFrame(update);
-  }
 }
 
-// === Overlay Helpers ===
-function showOverlay() {
-  overlay.classList.add('active');
-  overlay.style.opacity = 1;
-}
+function drawStartScreen() {
 
-function hideOverlay() {
-  overlay.style.opacity = 0;
-  overlay.style.background = 'rgba(0,0,0,0)';
-  setTimeout(() => {
-    overlay.classList.remove('active');
-    overlay.innerHTML = "";
-  }, 500);
-}
+  ctx.fillStyle = "#000";
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-// === Direction helper (used by keys + buttons) ===
-function setDirection(dir) {
-  if (dir === 'up' && direction.y === 0) direction = { x: 0, y: -1 };
-  else if (dir === 'down' && direction.y === 0) direction = { x: 0, y: 1 };
-  else if (dir === 'left' && direction.x === 0) direction = { x: -1, y: 0 };
-  else if (dir === 'right' && direction.x === 0) direction = { x: 1, y: 0 };
+  ctx.save();
+  ctx.textAlign = "center";
+
+  ctx.font = "30px Arial";
+  ctx.fillStyle = "#00ffff";
+  ctx.fillText("Press S to Start", canvas.width / 2, canvas.height / 2 + 20);
+
+  ctx.restore();
 }
 
 // === Main Loop ===
 function update(time) {
-  if (gameOver || paused || !started) return;
+
+  if (!started) {
+    drawStartScreen();
+    return requestAnimationFrame(update);
+  }
+
   const delta = time - lastTime;
   if (delta < speed) return requestAnimationFrame(update);
+
   lastTime = time;
 
   ctx.clearRect(0, 0, canvas.width, canvas.height);
-  moveSnake();
+
+  if (!gameOver && !paused) {
+    moveSnake();
+  }
+
   drawFood();
   drawSnake();
+
+  if (paused && !gameOver) {
+  ctx.save();
+  ctx.textAlign = "center";
+  ctx.font = "bold 60px Arial";
+  ctx.fillStyle = "#00ffff";
+  ctx.fillText("PAUSED", canvas.width / 2, canvas.height / 2);
+  ctx.restore();
+  }
+  
+  if (gameOver) {
+    drawGameOver();
+  }
+
   requestAnimationFrame(update);
 }
 
-// === Keyboard Controls ===
+requestAnimationFrame(update);
+// === Keyboard Controls ONLY ===
 window.addEventListener('keydown', (e) => {
   const key = e.key.toLowerCase();
 
@@ -275,46 +264,17 @@ window.addEventListener('keydown', (e) => {
   if (key === 'arrowright') setDirection('right');
 
   if (key === 's' && !started) {
-    started = true;
-    hideOverlay();
-    requestAnimationFrame(update);
+  started = true;
+  requestAnimationFrame(update);
   }
 
   if (key === 'p') togglePause();
   if (key === 'r') resetGame();
 });
 
-// === Canvas tap to start (mobile) ===
-canvas.addEventListener('touchstart', (e) => {
-  e.preventDefault();
-  if (!started && !gameOver) {
-    started = true;
-    hideOverlay();
-    requestAnimationFrame(update);
-  }
-}, { passive: false });
-
-canvas.addEventListener('pointerdown', (e) => {
-  if (!started && !gameOver) {
-    started = true;
-    hideOverlay();
-    requestAnimationFrame(update);
-  }
-});
-
-// === Mobile Buttons Bind ===
-function bindBtn(id, dir) {
-  const el = document.getElementById(id);
-  if (!el) return;
-  const handler = (e) => {
-    e.preventDefault();
-    setDirection(dir);
-  };
-  el.addEventListener('touchstart', handler, { passive: false });
-  el.addEventListener('pointerdown', handler);
+function setDirection(dir) {
+  if (dir === 'up' && direction.y === 0) direction = { x: 0, y: -1 };
+  else if (dir === 'down' && direction.y === 0) direction = { x: 0, y: 1 };
+  else if (dir === 'left' && direction.x === 0) direction = { x: -1, y: 0 };
+  else if (dir === 'right' && direction.x === 0) direction = { x: 1, y: 0 };
 }
-
-bindBtn('upBtn', 'up');
-bindBtn('downBtn', 'down');
-bindBtn('leftBtn', 'left');
-bindBtn('rightBtn', 'right');

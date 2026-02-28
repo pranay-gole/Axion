@@ -66,52 +66,48 @@
     }
 
     .login-box {
-      background: rgba(0, 0, 0, 0.55);
+      background: rgba(0, 0, 0, 0.4);
       padding: 40px;
       border-radius: 16px;
-      box-shadow: 0 0 15px #00fff7aa;
+      border: none;
+      backdrop-filter: blur(10px);
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+      width: 340px;
       text-align: center;
-      color: white;
-      width: 320px;
-      animation: fadeIn 1s ease-in-out;
     }
 
     .login-box h2 {
-      margin-bottom: 20px;
       color: #00fff7;
-      text-shadow: 0 0 10px #00fff7;
+      text-shadow: none;
+      margin-bottom: 28px;
     }
 
     .login-box input {
+      width: 100%;
+      margin-bottom: 15px;
+      padding: 12px;
+      border-radius: 6px;
+      border: 1px solid #00fff7aa;
       background: rgba(255, 255, 255, 0.15);
       color: #ffffff;
-      border: 1px solid #00fff7aa;
-      border-radius: 8px;
-      padding: 10px;
-      margin: 10px 0;
-      width: 100%;
     }
 
     .login-box input::placeholder { color: #cccccc; }
 
     .login-box button {
-      min-height: 44px;
-      margin-top: 10px;
       padding: 12px 30px;
       background: transparent;
       border: 2px solid #00fff7;
       border-radius: 8px;
       color: #00fff7;
       cursor: pointer;
-      transition: 0.3s ease;
       font-weight: bold;
-      box-shadow: 0 0 10px #00fff744;
+      box-shadow: 0 0 6px rgba(0, 255, 247, 0.4);
+      transition: 0.2s ease;
     }
 
     .login-box button:hover {
-      background: #00fff7;
-      color: #000;
-      box-shadow: 0 0 20px #00fff7cc;
+      box-shadow: 0 0 10px rgba(0, 255, 247, 0.6);
     }
 
     .login-box p {
@@ -126,6 +122,28 @@
     }
 
     .login-box p a:hover { text-decoration: underline; }
+
+    .password-wrapper {
+      position: relative;
+      width: 100%;
+    }
+
+    .password-wrapper input {
+      width: 100%;
+      padding-right: 50px; /* more space */
+    }
+
+    .toggle-password {
+      position: absolute;
+      right: 15px;
+      top: 50%;
+      transform: translateY(-50%);
+      
+      font-size: 18px;   /* bigger */
+      cursor: pointer;
+      color: #00fff7;
+      transition: 0.2s ease;
+    }
 
     @keyframes fadeIn {
       from { opacity: 0; transform: scale(0.95); }
@@ -147,10 +165,15 @@
 
   <div class="login-container">
     <form class="login-box" method="POST" action="{{ url_for('login') }}">
-      <h2>Login to <br>Axion</h2>
+      <h2>Login to Axion</h2>
 
       <input type="text" name="username" placeholder="Username" required>
-      <input type="password" name="password" placeholder="Password" required>
+      <div class="password-wrapper">
+        <input type="password" id="password" name="password" placeholder="Password" required>
+        <span class="toggle-password" onclick="togglePassword(this)">
+          🙈
+        </span>
+      </div>
       <button type="submit">Login</button>
 
       {% if error %}
@@ -194,6 +217,20 @@
     }
 
     animate();
+  
+    
+    function togglePassword(element) {
+      const input = document.getElementById("password");
+
+      if (input.type === "password") {
+        input.type = "text";
+        element.textContent = "🙉";   // eye with slash feel
+      } else {
+        input.type = "password";
+        element.textContent = "🙈";
+      }
+    }
+
   </script>
 
 </body>

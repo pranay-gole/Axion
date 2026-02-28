@@ -284,11 +284,28 @@ function jump() {
 }
 
 document.addEventListener("keydown", e => {
+
   if (e.code === "Space") jump();
-  if (e.key.toLowerCase() === "r" && gameState === "gameover") location.reload();
+
+  if (e.key.toLowerCase() === "r" && gameState === "gameover") {
+    location.reload();
+  }
+
+  // ✅ Keyboard Pause
+  if (e.key.toLowerCase() === "p" && gameState !== "gameover") {
+    if (gameState === "running") {
+      gameState = "paused";
+      document.getElementById("message").innerText = "Paused";
+    } else if (gameState === "paused") {
+      gameState = "running";
+      document.getElementById("message").innerText = "Press SPACE to Jump";
+    }
+  }
+
 });
 
-canvas.addEventListener("touchstart", jump);
+/* ================= REMOVE MOBILE SUPPORT ================= */
+// ❌ Removed: canvas.addEventListener("touchstart", jump);
 
 function randomRange(min, max) {
   return Math.random() * (max - min) + min;
@@ -297,15 +314,8 @@ function randomRange(min, max) {
 /* ================= THEME SYSTEM ================= */
 
 let currentTheme = localStorage.getItem("axionTheme") || "dark";
-const themeBtn = document.getElementById("themeBtn");
 
 applyTheme(currentTheme);
-
-themeBtn.addEventListener("click", () => {
-  currentTheme = currentTheme === "dark" ? "light" : "dark";
-  localStorage.setItem("axionTheme", currentTheme);
-  applyTheme(currentTheme);
-});
 
 function applyTheme(theme) {
 
@@ -313,12 +323,10 @@ function applyTheme(theme) {
     isLightMode = true;
     starCount = 0;
     stars = [];
-    themeBtn.innerText = "☀️ Day";
   } else {
     isLightMode = false;
     starCount = 120;
     initStars();
-    themeBtn.innerText = "🌙 Night";
   }
 }
 

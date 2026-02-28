@@ -11,9 +11,11 @@ canvas {
   width: 100vw;
   height: 100vh;
   background: transparent;
+  position: absolute;
+  z-index: 1;
 }
 
-#overlay {
+.overlay {
   position: absolute;
   top: 0;
   left: 0;
@@ -28,12 +30,12 @@ canvas {
 }
 
 .overlay-box {
-  background: rgba(10, 10, 20, 0.9);
-  border: 2px solid #00ffff;
+  background: rgba(0, 0, 0, 0.95);
+  border: 1.5px solid #00ffff;
   border-radius: 15px;
   padding: 20px 40px;
   text-align: center;
-  box-shadow: 0 0 25px #00ffff;
+  border: 1px solid rgba(0, 255, 255, 0.5);
 }
 
 .overlay-box p {
@@ -42,49 +44,27 @@ canvas {
   font-weight: bold;
 }
 
-/* 🔻 Mobile controls */
-
-.mobile-controls {
-  position: fixed;
-  bottom: 16px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 100%;
-  max-width: 420px;
-  padding: 0 16px;
-  display: none;              /* desktop me hide */
-  z-index: 5;
-  pointer-events: none;       /* sirf buttons interactable */
+.hidden {
+  display: none;
 }
 
-.mc-row {
-  display: flex;
-  justify-content: center;
-  gap: 16px;
-  margin-bottom: 8px;
+.overlay-box span {
+  font-weight: bold;
 }
 
-.mc-row-top {
-  justify-content: center;
-}
-
-.mc-row-mid {
-  justify-content: center;
-}
-
-.mc-btn {
-  flex: 1;
-  min-width: 56px;
-  min-height: 56px;
-  border-radius: 16px;
-  border: none;
-  background: rgba(0, 255, 255, 0.08);
+.game-btn {
+  margin-top: 10px;
+  padding: 8px 20px;
+  background: #001a1a;
+  border: 1.5px solid #00ffff;
   color: #00ffff;
-  font-size: 22px;
-  font-weight: 700;
-  box-shadow: 0 0 15px rgba(0, 255, 255, 0.4);
-  backdrop-filter: blur(6px);
-  pointer-events: auto;
+  font-family: 'Orbitron', sans-serif;
+  border-radius: 10px;
+  cursor: pointer;
+}
+
+.game-btn:hover {
+  background: #002f2f;
 }
 
 .exit-gate {
@@ -104,7 +84,7 @@ canvas {
   text-transform: uppercase;
   letter-spacing: 1px;
   text-decoration: none;
-  box-shadow: 0 0 16px rgba(0, 255, 247, 0.6);
+  box-shadow: none;
   cursor: pointer;
   z-index: 999;
   transition: 0.2s ease;
@@ -114,24 +94,4 @@ canvas {
   font-size: 1.1rem;
 }
 
-.exit-gate:hover {
-  background: rgba(0, 255, 247, 0.1);
-  box-shadow: 0 0 24px rgba(0, 255, 247, 0.9);
-}
 
-/* mobile pe thoda chhota */
-@media (max-width: 768px) {
-  .exit-gate {
-    top: 10px;
-    left: 10px;
-    padding: 6px 12px;
-    font-size: 0.75rem;
-  }
-}
-
-/* Mobile / tablet view pe controls show karo */
-@media (max-width: 820px) {
-  .mobile-controls {
-    display: block;
-  }
-}

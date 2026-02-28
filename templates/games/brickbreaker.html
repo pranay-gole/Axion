@@ -16,17 +16,23 @@
 
   <canvas id="brickCanvas"></canvas>
 
-  <div id="overlay">
-    <p id="overlay-text">Press S or Tap to Start</p>
-  </div>
-
-  <!-- 🔻 Mobile controls -->
-  <div class="mobile-controls">
-    <div class="mobile-controls-inner">
-      <button class="mc-btn" id="leftBtn">◀</button>
-      <button class="mc-btn" id="rightBtn">▶</button>
+   <div id="startScreen" class="overlay">
+      <div class="mini-card">
+        Press <span>S</span> to Start
+      </div>
     </div>
-  </div>
+
+    <div id="pauseScreen" class="overlay hidden">
+      <div class="mini-card">
+        Press <span>P</span> to Resume
+      </div>
+    </div>
+
+    <div id="gameOverScreen" class="overlay hidden">
+      <div class="mini-card">
+        Press <span>R</span> to Restart
+      </div>
+    </div>
 
   <script src="{{ url_for('static', filename='games/brickbreaker/script.js') }}"></script>
 </body>

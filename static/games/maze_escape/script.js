@@ -10,12 +10,14 @@ let stack = [];
 let player, goal;
 let timeLeft = 30;
 let timerInterval;
-let level = 1;
 let powerUps = [];
-let paused = false;
-let overlay = document.getElementById("overlay");
-let overlayText = document.getElementById("overlay-text");
-let gameWon = false;
+let state = "start"; 
+let level = Number(localStorage.getItem("mazeLevel")) || 1;
+const levelScreen = document.getElementById("levelScreen");
+const startScreen = document.getElementById("startScreen");
+const pauseScreen = document.getElementById("pauseScreen");
+const gameOverScreen = document.getElementById("gameOverScreen");
+const winScreen = document.getElementById("winScreen");
 
 // === Rounded rectangle helper ===
 CanvasRenderingContext2D.prototype.roundRect = function (x, y, w, h, r) {
@@ -239,7 +241,7 @@ function drawUI() {
 
 // === Controls ===
 function movePlayer(dir) {
-  if (paused || gameWon) return;
+  if (state !== "playing") return;
 
   let next = { i: player.i, j: player.j };
   let current = maze[index(player.i, player.j)];
@@ -249,7 +251,8 @@ function movePlayer(dir) {
   else if (dir === "DOWN" && !current.walls[2]) next.j++;
   else if (dir === "LEFT" && !current.walls[3]) next.i--;
 
-  if (next.i >= 0 && next.i < cols && next.j >= 0 && next.j < rows) player = next;
+  if (next.i >= 0 && next.i < cols && next.j >= 0 && next.j < rows)
+      player = next;
 
   powerUps.forEach(p => {
     if (p.active && p.i === player.i && p.j === player.j) {
@@ -258,57 +261,76 @@ function movePlayer(dir) {
     }
   });
 
+  // ✅ GOAL CHECK MUST BE HERE
   if (player.i === goal.i && player.j === goal.j) {
+
     clearInterval(timerInterval);
+
     if (level >= 10) {
-      winGame();
+      state = "win";
+      localStorage.removeItem("mazeLevel");
+      winScreen.classList.remove("hidden");
     } else {
-      overlayText.textContent = "Level Complete! Press N for Next Level";
-      overlay.style.display = "flex";
+      state = "levelcomplete";
+      levelScreen.classList.remove("hidden");
+      localStorage.setItem("mazeLevel", level);
     }
   }
 }
 
 function startGame() {
-  overlay.style.display = "none";
-  timeLeft = 30 + (level - 1) * 2;
-  gameWon = false;
-  generateMaze();
+
+  state = "playing";
+
+  startScreen.classList.add("hidden");
+  pauseScreen.classList.add("hidden");
+  gameOverScreen.classList.add("hidden");
+  winScreen.classList.add("hidden");
+  levelScreen.classList.add("hidden");
+
   clearInterval(timerInterval);
+
+  timeLeft = 35 + (level - 1) * 5;
+
+  generateMaze();
+
   timerInterval = setInterval(() => {
-    if (!paused) {
-      timeLeft--;
-      if (timeLeft <= 0) {
-        clearInterval(timerInterval);
-        overlayText.textContent = "⛔ Time's Up! Press R to Restart";
-        overlay.style.display = "flex";
-      }
-    }
+
+    if (state !== "playing") return;
+
+    timeLeft--;
+
+    if (timeLeft <= 0) {
+  clearInterval(timerInterval);
+  state = "gameover";
+  gameOverScreen.classList.remove("hidden");
+}
   }, 1000);
 }
 
-function nextLevel() {
-  level++;
-  startGame();
-}
-
 function restartGame() {
+  localStorage.removeItem("mazeLevel");
   level = 1;
-  gameWon = false;
-  startGame();
+  state = "start";
+
+  gameOverScreen.classList.add("hidden");
+  winScreen.classList.add("hidden");
+  pauseScreen.classList.add("hidden");
+
+  startScreen.classList.remove("hidden");
+  clearInterval(timerInterval);
 }
 
 function togglePause() {
-  paused = !paused;
-  overlayText.textContent = paused ? "⏸️ Game Paused! Press P to Resume" : "";
-  overlay.style.display = paused ? "flex" : "none";
-}
 
-function winGame() {
-  gameWon = true;
-  overlay.style.display = "flex";
-  overlayText.innerHTML = "🎉 YOU WIN!<br><br>Press R to Restart";
-  createConfetti();
+  if (state === "playing") {
+    state = "paused";
+    pauseScreen.classList.remove("hidden");
+  } 
+  else if (state === "paused") {
+    state = "playing";
+    pauseScreen.classList.add("hidden");
+  }
 }
 
 // === Confetti effect ===
@@ -336,71 +358,48 @@ function drawConfetti() {
 }
 
 document.addEventListener("keydown", e => {
-  if (e.key === "ArrowUp" || e.key === "w") movePlayer("UP");
-  if (e.key === "ArrowDown" || e.key === "s") movePlayer("DOWN");
-  if (e.key === "ArrowLeft" || e.key === "a") movePlayer("LEFT");
-  if (e.key === "ArrowRight" || e.key === "d") movePlayer("RIGHT");
-  if (e.key === "S" || e.key === "s") startGame();
-  if (e.key === "N" || e.key === "n") nextLevel();
-  if (e.key === "R" || e.key === "r") restartGame();
-  if (e.key === "P" || e.key === "p") togglePause();
+
+  // Movement only while playing
+  if (state === "playing") {
+    if (e.key === "ArrowUp" || e.key === "w") movePlayer("UP");
+    if (e.key === "ArrowDown" || e.key === "s") movePlayer("DOWN");
+    if (e.key === "ArrowLeft" || e.key === "a") movePlayer("LEFT");
+    if (e.key === "ArrowRight" || e.key === "d") movePlayer("RIGHT");
+  }
+
+  // Start
+  if ((e.key === "S" || e.key === "s") && state === "start") {
+    startGame();
+  }
+
+  // Next level
+  if ((e.key === "N" || e.key === "n") && state === "levelcomplete") {
+    level++;
+    localStorage.setItem("mazeLevel", level);
+    startGame();
+  }
+
+  // Restart
+  if ((e.key === "R" || e.key === "r") && 
+      (state === "gameover" || state === "win")) {
+    restartGame();
+  }
+
+  // Pause toggle
+  if (e.key === "P" || e.key === "p") {
+    togglePause();
+  }
+
 });
 
 function animate() {
   drawMaze();
-  if (gameWon) drawConfetti();
+  if (state === "win") drawConfetti();
   requestAnimationFrame(animate);
 }
 
 generateMaze();
 animate();
 
-
-// ==== 🔻 MOBILE / TOUCH CONTROLS BINDING ====
-
-(function () {
-  const upBtn = document.getElementById("upBtn");
-  const downBtn = document.getElementById("downBtn");
-  const leftBtn = document.getElementById("leftBtn");
-  const rightBtn = document.getElementById("rightBtn");
-
-  function bindDir(btn, dir) {
-    if (!btn) return;
-    const handle = (e) => {
-      e.preventDefault();
-      movePlayer(dir);
-    };
-    btn.addEventListener("click", handle);
-    btn.addEventListener("touchstart", handle, { passive: false });
-  }
-
-  bindDir(upBtn, "UP");
-  bindDir(downBtn, "DOWN");
-  bindDir(leftBtn, "LEFT");
-  bindDir(rightBtn, "RIGHT");
-
-  // 🔻 Overlay tap: Start / Next / Restart / Resume
-  function handleOverlayTap(e) {
-    if (e) e.preventDefault();
-    const txt = (overlayText.textContent || overlayText.innerText || "").toLowerCase();
-
-    if (txt.includes("start")) {
-      // "Press S to Start"
-      startGame();
-    } else if (txt.includes("level complete")) {
-      // "Level Complete! Press N for Next Level"
-      nextLevel();
-    } else if (txt.includes("time's up") || txt.includes("you win") || txt.includes("restart")) {
-      // restart from win/time-up text
-      restartGame();
-    } else if (txt.includes("pause") || txt.includes("resume")) {
-      // pause / resume
-      togglePause();
-    }
-  }
-
-  if (overlay) {
-    overlay.addEventListener("click", handleOverlayTap);
-    overlay.addEventListener("touchstart", handleOverlayTap, { passive: false });
-  }
-})();
+state = "start";
+startScreen.classList.remove("hidden");

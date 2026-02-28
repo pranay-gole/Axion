@@ -1,3 +1,7 @@
+const startScreen = document.getElementById("startScreen");
+const pauseScreen = document.getElementById("pauseScreen");
+const gameOverScreen = document.getElementById("gameOverScreen");
+const finalScoreText = document.getElementById("finalScore");
 const canvas = document.getElementById("brickCanvas");
 const ctx = canvas.getContext("2d");
 canvas.width = 800;
@@ -16,9 +20,6 @@ let rightPressed = false;
 let leftPressed = false;
 let paused = false;
 let gameRunning = false;
-
-let overlay = document.getElementById("overlay");
-let overlayText = document.getElementById("overlay-text");
 let score = 0;
 let level = 1;
 const maxLevel = 15;
@@ -177,7 +178,9 @@ function draw() {
 
 function startGame() {
   if (gameRunning) return;
-  overlay.classList.add("hidden");
+  startScreen.classList.add("hidden");
+  gameOverScreen.classList.add("hidden");
+  pauseScreen.classList.add("hidden");
   gameRunning = true;
   paused = false;
   // bricks/balls might already be set from restartGame; guard:
@@ -206,9 +209,7 @@ function nextLevel() {
 }
 
 function gameOver() {
-  overlay.classList.remove("hidden");
-  overlayText.style.color = "red";
-  overlayText.textContent = "💀 GAME OVER - Press R or Tap to Restart";
+  gameOverScreen.classList.remove("hidden");
   gameRunning = false;
 }
 
@@ -217,23 +218,21 @@ function restartGame() {
   level = 1;
   initBricks();
   initBalls(1);
-  overlayText.style.color = "#00ffff";
-  overlayText.textContent = "Press S or Tap to Start";
-  overlay.classList.remove("hidden");
+  gameOverScreen.classList.add("hidden");
+  startScreen.classList.remove("hidden");
   gameRunning = false;
   paused = false;
 }
 
 function togglePause() {
   if (!gameRunning) return;
+
   paused = !paused;
+
   if (paused) {
-    overlay.classList.remove("hidden");
-    overlayText.style.color = "#00ffff";
-    overlayText.textContent = "⏸️ Game Paused - Press P or Tap to Resume";
+    pauseScreen.classList.remove("hidden");
   } else {
-    overlay.classList.add("hidden");
-    // resume loop
+    pauseScreen.classList.add("hidden");
     draw();
   }
 }
@@ -257,73 +256,3 @@ document.addEventListener("keyup", (e) => {
   if (e.key === "Left" || e.key === "ArrowLeft" || e.key === "a" || e.key === "A")
     leftPressed = false;
 });
-
-// 🔻 Mobile controls (buttons)
-(function bindMobileControls() {
-  const leftBtn = document.getElementById("leftBtn");
-  const rightBtn = document.getElementById("rightBtn");
-  if (!leftBtn || !rightBtn) return;
-
-  const leftDown = (e) => {
-    e.preventDefault();
-    leftPressed = true;
-  };
-  const leftUp = (e) => {
-    e.preventDefault();
-    leftPressed = false;
-  };
-
-  const rightDown = (e) => {
-    e.preventDefault();
-    rightPressed = true;
-  };
-  const rightUp = (e) => {
-    e.preventDefault();
-    rightPressed = false;
-  };
-
-  // left
-  leftBtn.addEventListener("touchstart", leftDown, { passive: false });
-  leftBtn.addEventListener("touchend", leftUp, { passive: false });
-  leftBtn.addEventListener("pointerdown", leftDown);
-  leftBtn.addEventListener("pointerup", leftUp);
-  leftBtn.addEventListener("pointerleave", leftUp);
-
-  // right
-  rightBtn.addEventListener("touchstart", rightDown, { passive: false });
-  rightBtn.addEventListener("touchend", rightUp, { passive: false });
-  rightBtn.addEventListener("pointerdown", rightDown);
-  rightBtn.addEventListener("pointerup", rightUp);
-  rightBtn.addEventListener("pointerleave", rightUp);
-})();
-
-// 🔻 Tap / click overlay: start / restart / resume
-function handleOverlayTap() {
-  // If paused → resume
-  if (paused && gameRunning) {
-    togglePause();
-    return;
-  }
-
-  // If not running (initial / game over / win) → restart + start
-  if (!gameRunning) {
-    // if it's the very first time (score 0 & level 1 & no bricks), just init+start
-    if (score === 0 && level === 1 && bricks.length === 0) {
-      initBricks();
-      initBalls(1);
-      startGame();
-    } else {
-      restartGame();
-      startGame();
-    }
-  }
-}
-
-overlay.addEventListener("click", handleOverlayTap);
-overlay.addEventListener("touchstart", (e) => {
-  e.preventDefault();
-  handleOverlayTap();
-}, { passive: false });
-
-// initial text
-overlayText.textContent = "Press S or Tap to Start";

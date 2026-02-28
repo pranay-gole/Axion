@@ -1,10 +1,9 @@
 const canvas = document.getElementById("gameCanvas");
 const ctx = canvas.getContext("2d");
 const scoreDisplay = document.getElementById("score");
-const message = document.getElementById("message");
-const jumpBtn = document.getElementById("jumpBtn");
+const overlayText = document.getElementById("overlayText");
 
-let orb = { x: 150, y: 300, radius: 15, velocity: 0 };
+let orb = { x: 0, y: 0, radius: 15, velocity: 0 };
 let gravity = 0.5;
 let jump = -8;
 let pipes = [];
@@ -18,29 +17,52 @@ let paused = false;
 function resizeCanvas() {
   canvas.width = window.innerWidth;
   canvas.height = window.innerHeight;
+  orb.x = canvas.width * 0.2;
   orb.y = canvas.height / 2;
 }
 window.addEventListener("resize", resizeCanvas);
 resizeCanvas();
 
-function resetGame() {
+function startGame() {
+  started = true;
+  overlayText.classList.add("hidden");
+}
+
+function restartGame() {
   orb.y = canvas.height / 2;
   orb.velocity = 0;
   pipes = [];
   score = 0;
   frame = 0;
   gameOver = false;
-  started = false;
   paused = false;
+  started = true;
+
   scoreDisplay.textContent = "0";
-  message.textContent = "Tap or press SPACE to start";
-  message.style.display = "block";
+  overlayText.classList.add("hidden");
+}
+
+function pauseGame() {
+  if (!gameOver && started) {
+    paused = true;
+    overlayText.textContent = "Press P to Resume";
+    overlayText.classList.remove("hidden");
+  }
+}
+
+function resumeGame() {
+  paused = false;
+  overlayText.classList.add("hidden");
 }
 
 function drawOrb() {
-  const glow = ctx.createRadialGradient(orb.x, orb.y, 2, orb.x, orb.y, orb.radius * 3);
+  const glow = ctx.createRadialGradient(
+    orb.x, orb.y, 2,
+    orb.x, orb.y, orb.radius * 3
+  );
   glow.addColorStop(0, "#ff00ff");
   glow.addColorStop(1, "rgba(0,255,255,0)");
+
   ctx.beginPath();
   ctx.fillStyle = glow;
   ctx.arc(orb.x, orb.y, orb.radius, 0, Math.PI * 2);
@@ -57,20 +79,28 @@ function createPipe() {
 function drawPipes() {
   ctx.shadowBlur = 15;
   ctx.shadowColor = "#00ffff";
+
   pipes.forEach(pipe => {
     ctx.fillStyle = "#00ffff";
     ctx.fillRect(pipe.x, 0, 50, pipe.top);
     ctx.fillRect(pipe.x, pipe.bottom, 50, canvas.height - pipe.bottom);
   });
+
   ctx.shadowBlur = 0;
 }
 
 function update() {
+
+  // ✅ Proper pause handling
   if (paused) {
-    message.textContent = "⏸️ Paused";
-    message.style.display = "block";
     requestAnimationFrame(update);
     return;
+  }
+
+  // ✅ Handle game over overlay safely
+  if (gameOver) {
+  overlayText.textContent = "Press R to Restart";
+  overlayText.classList.remove("hidden");
   }
 
   ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -84,11 +114,11 @@ function update() {
 
     if (frame % 100 === 0) createPipe();
 
-    pipes.forEach(pipe => {
+    pipes.forEach((pipe, index) => {
       pipe.x -= 3 + Math.min(score / 5, 3);
 
       if (pipe.x + 50 < 0) {
-        pipes.shift();
+        pipes.splice(index, 1);
         score++;
         scoreDisplay.textContent = score;
       }
@@ -111,61 +141,53 @@ function update() {
 
   drawOrb();
 
-  if (gameOver) {
-    message.textContent = "💀 Game Over! Press R or tap to Restart";
-    message.style.display = "block";
-  }
-
   requestAnimationFrame(update);
 }
 
 function flap() {
-  if (!started) {
-    started = true;
-    if (!gameOver) {
-      message.style.display = "none";
-    }
-  }
-  if (!gameOver && !paused) {
+  if (started && !gameOver && !paused) {
     orb.velocity = jump;
   }
 }
 
-// Keyboard controls
 document.addEventListener("keydown", (e) => {
+
+  // Space = flap
   if (e.code === "Space") {
     e.preventDefault();
     flap();
   }
-  if (e.key === "r" || e.key === "R") resetGame();
-  if (e.key === "p" || e.key === "P") {
-    paused = !paused;
-    if (!paused && !gameOver && started) {
-      message.style.display = "none";
+
+  // ✅ S = Start
+  if (e.key === "s" || e.key === "S") {
+    if (!started) {
+      startGame();
     }
   }
+
+  // ✅ R = Restart only if game over
+  if ((e.key === "r" || e.key === "R") && gameOver) {
+    restartGame();
+  }
+
+  // ✅ P = Pause / Resume
+  if (e.key === "p" || e.key === "P") {
+    if (!paused) {
+      pauseGame();
+    } else {
+      resumeGame();
+    }
+  }
+
 });
 
-// 🖱️ Mouse click anywhere on canvas = flap
+// Mouse click = flap
 canvas.addEventListener("mousedown", () => {
   flap();
 });
 
-// 📱 Tap on canvas = flap
-canvas.addEventListener("touchstart", (e) => {
-  e.preventDefault();
-  flap();
-}, { passive: false });
+overlayText.textContent = "Press S to Start";
+overlayText.classList.remove("hidden");
 
-// 📱 Mobile JUMP button
-if (jumpBtn) {
-  const handleTap = (e) => {
-    e.preventDefault();
-    flap();
-  };
-  jumpBtn.addEventListener("click", handleTap);
-  jumpBtn.addEventListener("touchstart", handleTap, { passive: false });
-}
-
-resetGame();
+// Start loop
 update();

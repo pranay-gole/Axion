@@ -64,21 +64,20 @@
     }
 
     .register-box {
-      background: rgba(0, 0, 0, 0.55);
-      padding: 40px;
+      background: rgba(0, 0, 0, 0.4);
+      padding: 40px;                      /* slightly smaller */
       border-radius: 16px;
-      box-shadow: 0 0 15px #00fff7aa;
+      border: none;
+      backdrop-filter: blur(10px);
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+      width: 340px;
       text-align: center;
-      color: white;
-      width: 100%;
-      max-width: 350px;
-      animation: fadeIn 1s ease-in-out;
     }
 
     .register-box h2 {
-      margin-bottom: 20px;
       color: #00fff7;
-      text-shadow: 0 0 10px #00fff7;
+      margin-bottom: 28px;
+      text-shadow: none;
     }
 
     .register-box input {
@@ -101,15 +100,13 @@
       border-radius: 8px;
       color: #00fff7;
       cursor: pointer;
-      transition: 0.3s ease;
+      transition: 0.2s ease;
       font-weight: bold;
-      box-shadow: 0 0 10px #00fff744;
+      box-shadow: 0 0 6px rgba(0, 255, 247, 0.4);
     }
 
     .register-box button:hover {
-      background: #00fff7;
-      color: #000;
-      box-shadow: 0 0 20px #00fff7cc;
+       box-shadow: 0 0 10px rgba(0, 255, 247, 0.6);
     }
 
     .login-link {
@@ -123,6 +120,27 @@
     }
 
     .login-link a:hover { text-decoration: underline; }
+
+    .password-wrapper {
+      position: relative;
+      width: 100%;
+    }
+
+    .password-wrapper input {
+      width: 100%;
+      padding-right: 50px;
+    }
+
+    .toggle-password {
+      position: absolute;
+      right: 15px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 18px;
+      cursor: pointer;
+      color: #00fff7;
+      transition: 0.2s ease;
+    }
 
     @keyframes fadeIn {
       from { opacity: 0; transform: scale(0.95); }
@@ -145,7 +163,12 @@
     <form class="register-box" method="POST">
       <h2>Create Your Account</h2>
       <input type="text" name="username" placeholder="Username" required>
-      <input type="password" name="password" placeholder="Password" required>
+      <div class="password-wrapper">
+        <input type="password" id="registerPassword" name="password" placeholder="Password" required>
+        <span class="toggle-password" onclick="toggleRegisterPassword(this)">
+          🙈
+        </span>
+      </div>
       <button type="submit">Register</button>
 
       <div class="login-link">
@@ -185,6 +208,19 @@
     }
 
     animate();
+
+     
+    function toggleRegisterPassword(element) {
+      const input = document.getElementById("registerPassword");
+
+      if (input.type === "password") {
+        input.type = "text";
+        element.textContent = "🙉";   
+      } else {
+        input.type = "password";
+        element.textContent = "🙈";
+      }
+    }
   </script>
 
 </body>

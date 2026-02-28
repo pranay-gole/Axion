@@ -39,16 +39,3 @@ canvas {
   z-index: 10;
 }
 
-.theme-btn {
-  position: absolute;
-  top: 20px;
-  right: 20px;
-  padding: 8px 14px;
-  border-radius: 20px;
-  background: rgba(255,255,255,0.08);
-  border: 1px solid rgba(255,255,255,0.2);
-  backdrop-filter: blur(8px);
-  color: white;
-  cursor: pointer;
-}
-

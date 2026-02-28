@@ -15,22 +15,39 @@
   </a>
   
   <canvas id="mazeCanvas"></canvas>
-
-  <div id="overlay">
+  
+    <!-- START -->
+  <div id="startScreen" class="overlay">
     <div class="overlay-box">
-      <p id="overlay-text">Press S to Start</p>
+      Press <span>S</span> to Start
     </div>
   </div>
 
-  <!-- 🔻 Mobile controls (for movement) -->
-  <div class="mobile-controls">
-    <div class="mc-row mc-row-top">
-      <button class="mc-btn" id="upBtn">▲</button>
+  <!-- PAUSE -->
+  <div id="pauseScreen" class="overlay hidden">
+    <div class="overlay-box">
+      Press <span>P</span> to Resume
     </div>
-    <div class="mc-row mc-row-mid">
-      <button class="mc-btn" id="leftBtn">◀</button>
-      <button class="mc-btn" id="downBtn">▼</button>
-      <button class="mc-btn" id="rightBtn">▶</button>
+  </div>
+
+  <!-- LEVEL COMPLETE -->
+  <div id="levelScreen" class="overlay hidden">
+    <div class="overlay-box">
+      Level Complete! Press <span>N</span> for Next Level
+    </div>
+  </div>
+
+  <!-- GAME OVER -->
+  <div id="gameOverScreen" class="overlay hidden">
+    <div class="overlay-box">
+      Press <span>R</span> to Restart
+    </div>
+  </div>
+
+  <!-- WIN -->
+  <div id="winScreen" class="overlay hidden">
+    <div class="overlay-box">
+      🎉 You Win! Press <span>R</span> to Restart
     </div>
   </div>
 

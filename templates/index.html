@@ -128,28 +128,23 @@
     }
 
     .btn {
-      position: relative;
-      padding: 15px 40px;
-      color: #00fff7;
-      font-size: 1em;
-      text-transform: uppercase;
-      letter-spacing: 2px;
-      background: transparent;
-      border: 2px solid #00fff7;
-      border-radius: 10px;
-      text-decoration: none;
-      transition: 0.4s ease-in-out;
-      box-shadow: 0 0 8px #00fff744, 0 0 20px #00fff722 inset;
-      backdrop-filter: blur(4px);
-      z-index: 1;
-      overflow: hidden;
-    }
+    padding: 15px 40px;
+    font-size: 1em;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    background: rgba(0, 0, 0, 0.4);             /* solid background */
+    color: #00fff7;
+    border: 2px solid #00fff7;
+    border-radius: 8px;
+    text-decoration: none;
+    box-shadow: 0 0 6px rgba(0, 255, 247, 0.4);
+    transition: 0.2s ease;
+  }
 
-    .btn:hover {
-      background-color: rgba(0, 255, 247, 0.1);
-      box-shadow: 0 0 20px #00fff7cc, 0 0 40px #00fff7aa inset;
-      color: white;
-    }
+  .btn:hover {
+    /* slightly stronger but still controlled */
+    box-shadow: 0 0 10px rgba(0, 255, 247, 0.6);
+  }
 
     @keyframes fadeIn {
       from { opacity: 0; transform: translateY(-20px); }

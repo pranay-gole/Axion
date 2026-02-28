@@ -8,27 +8,43 @@
 </head>
 <body>
 
-  <!-- 🔥 Exit Gate Added -->
+  <!-- Exit Gate -->
   <a href="{{ url_for('dashboard') }}" class="exit-gate">
     <span class="exit-gate-icon">⮌</span>
     <span>Exit Gate</span>
   </a>
   
+  <!-- Background Particles -->
   <canvas id="particles"></canvas>
 
-  <h1>Memory Flip</h1>
-
-  <div class="scoreboard">
-    <div class="player active" id="p1">
-      <span>Player 1</span> <strong id="p1Score">0</strong>
-    </div>
-    <div class="player" id="p2">
-      <span>Player 2</span> <strong id="p2Score">0</strong>
-    </div>
+  <!-- Mode Selection (Top Right) -->
+  <div class="mode-select">
+    <button id="singleBtn" class="mode-btn active">Single Player</button>
+    <button id="multiBtn" class="mode-btn">Multiplayer</button>
   </div>
 
+  <!-- Scoreboard -->
+  <div class="scoreboard">
+
+    <div class="player active" id="p1">
+      <!-- If logged in, replace Player 1 with username -->
+      <span id="p1Name">
+       <span id="p1Name">{{ username }}</span>
+      </span>
+      <strong id="p1Score">0</strong>
+    </div>
+
+    <div class="player" id="p2">
+      <span id="p2Name">AI</span>
+      <strong id="p2Score">0</strong>
+    </div>
+
+  </div>
+
+  <!-- Game Board -->
   <div class="game-board" id="gameBoard"></div>
 
+  <!-- Game Over Overlay -->
   <div id="overlay" class="overlay">
     <div class="message-box">
       <p id="winnerMessage"></p>
