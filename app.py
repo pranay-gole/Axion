@@ -1,5 +1,5 @@
 from flask import Flask, render_template, request, redirect, url_for, session
-import psycopg2
+import psycopg
 import os
 from werkzeug.security import generate_password_hash, check_password_hash
 from datetime import timedelta
@@ -12,7 +12,6 @@ app.permanent_session_lifetime = timedelta(days=7)
 def get_db_connection():
     conn = psycopg2.connect(
         os.environ.get("DATABASE_URL"),
-        sslmode="require"
     )
     return conn
 
