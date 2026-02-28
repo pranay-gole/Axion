@@ -5,60 +5,65 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600&display=swap" rel="stylesheet">
     <style>
-        body {
-            background: linear-gradient(to bottom, #050510, #101020);
-            font-family: 'Orbitron', sans-serif;
-            color: white;
-            text-align: center;
-            margin: 0;
-        }
+    body {
+        background: #000; /* Pure black */
+        font-family: 'Orbitron', sans-serif;
+        color: white;
+        margin: 0;
+        position: relative;
+    }
 
-        h1 {
-            margin-top: 40px;
-            color: #00fff7;
-        }
+    h1 {
+        margin-top: 30px;
+        text-align: center;
+        color: #00fff7;
+    }
 
-        .leaderboard {
-            width: 90%;
-            max-width: 800px;
-            margin: 40px auto;
-        }
+    .leaderboard {
+    width: 90%;
+    max-width: 850px;
+    margin: 20px auto 0 auto; /* top margin reduced */
+    }
 
-        .row {
-            display: flex;
-            justify-content: space-between;
-            padding: 15px 20px;
-            margin: 10px 0;
-            border-radius: 10px;
-            background: rgba(0,0,0,0.4);
-            box-shadow: 0 0 10px #00fff755;
-        }
+    .row {
+    display: grid;
+    grid-template-columns: 80px 1fr 150px 120px;
+    align-items: center;
+    padding: 15px 20px;
+    margin: 12px 0;
+    border-radius: 12px;
+    background: rgba(0, 0, 0, 0.6);
+    box-shadow: 0 0 12px #00fff755;
+    text-align: center;
+    }
+    
+    .top1 { background: gold; color: black; }
+    .top2 { background: silver; color: black; }
+    .top3 { background: #cd7f32; color: black; }
 
-        .top1 { background: gold; color: black; }
-        .top2 { background: silver; color: black; }
-        .top3 { background: #cd7f32; color: black; }
+    .rank { font-weight: bold; }
 
-        .rank { font-weight: bold; }
+    /* NEW BACK BUTTON STYLE */
+    .back-link {
+        position: absolute;
+        top: 20px;
+        left: 20px;
+        padding: 8px 18px;
+        border-radius: 999px;
+        border: 2px solid;
+        text-decoration: none;
+        background: rgba(0, 10, 25, 0.85);
+        color: #00fff7;
+        font-size: 18px;
+        font-weight: bold;
+        transition: 0.2s ease;
+    }
 
-        .back-btn {
-            display: inline-block;
-            margin-top: 30px;
-            padding: 10px 20px;
-            border: 2px solid #00fff7;
-            color: #00fff7;
-            text-decoration: none;
-            border-radius: 6px;
-        }
-
-        .back-btn:hover {
-            background: #00fff7;
-            color: black;
-        }
-    </style>
+</style>
 </head>
 <body>
 
-<h1>🏆 Global Leaderboard</h1>
+<h1>Leaderboard 🏆 </h1>
 
 <div class="leaderboard">
     {% for user in users %}
@@ -75,7 +80,7 @@
     {% endfor %}
 </div>
 
-<a href="{{ url_for('dashboard') }}" class="back-btn">⬅ Back to Dashboard</a>
+<a href="{{ url_for('dashboard') }}" class="back-link">← Back</a>
 
 </body>
 </html>

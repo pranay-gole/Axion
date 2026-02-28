@@ -3,6 +3,8 @@ import psycopg
 import os
 from werkzeug.security import generate_password_hash, check_password_hash
 from datetime import timedelta
+from dotenv import load_dotenv
+load_dotenv()
 
 app = Flask(__name__)
 app.secret_key = os.environ.get("SECRET_KEY", "fallback_dev_key")
@@ -10,6 +12,7 @@ app.permanent_session_lifetime = timedelta(days=7)
 
 def get_db_connection():
     DATABASE_URL = os.environ.get("DATABASE_URL")
+    print("DATABASE_URL =", DATABASE_URL)
 
     if not DATABASE_URL:
         raise Exception("DATABASE_URL not set in environment variables")
