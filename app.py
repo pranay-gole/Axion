@@ -8,13 +8,17 @@ app = Flask(__name__)
 app.secret_key = "super_secret_key_123"
 app.permanent_session_lifetime = timedelta(days=7)
 
-# PostgreSQL connection
 def get_db_connection():
-    conn = psycopg2.connect(
-        os.environ.get("DATABASE_URL"),
-    )
-    return conn
+    DATABASE_URL = os.environ.get("DATABASE_URL")
 
+    if not DATABASE_URL:
+        raise Exception("DATABASE_URL not set in environment variables")
+
+    if DATABASE_URL.startswith("postgres://"):
+        DATABASE_URL = DATABASE_URL.replace("postgres://", "postgresql://", 1)
+
+    conn = psycopg.connect(DATABASE_URL, sslmode="require")
+    return conn
 
 # -----------------------
 # Home Page
