@@ -5,7 +5,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from datetime import timedelta
 
 app = Flask(__name__)
-app.secret_key = "super_secret_key_123"
+app.secret_key = os.environ.get("SECRET_KEY", "fallback_dev_key")
 app.permanent_session_lifetime = timedelta(days=7)
 
 def get_db_connection():
@@ -14,7 +14,7 @@ def get_db_connection():
     if not DATABASE_URL:
         raise Exception("DATABASE_URL not set in environment variables")
 
-    if DATABASE_URL.startswith("postgres://"):
+    if DATABASE_URL and DATABASE_URL.startswith("postgres://"):
         DATABASE_URL = DATABASE_URL.replace("postgres://", "postgresql://", 1)
 
     conn = psycopg.connect(DATABASE_URL, sslmode="require")
@@ -278,32 +278,6 @@ def leaderboard():
 
     return render_template("leaderboard.html", users=ranked_users)
 
-
-# -----------------------
-# Init DB (Run once)
-# -----------------------
-@app.route("/initdb")
-def initdb():
-    conn = get_db_connection()
-    cur = conn.cursor()
-
-    cur.execute("""
-        CREATE TABLE IF NOT EXISTS users (
-            username TEXT PRIMARY KEY,
-            password TEXT,
-            email TEXT,
-            avatar TEXT,
-            bio TEXT,
-            dob TEXT,
-            exp INTEGER DEFAULT 0,
-            is_admin INTEGER DEFAULT 0
-        )
-    """)
-
-    conn.commit()
-    conn.close()
-
-    return "Database initialized!"
 
 
 # -----------------------
