@@ -282,7 +282,64 @@ def leaderboard():
     return render_template("leaderboard.html", users=ranked_users)
 
 
+# -----------------------
+# Game Routes
+# -----------------------
+@app.route('/memory')
+def memory():
+    if "username" not in session:
+        return redirect(url_for("login"))
+    add_exp(session["username"], 15)
+    return render_template('games/memory.html')
 
+@app.route('/snake')
+def snake():
+    if "username" not in session:
+        return redirect(url_for("login"))
+    add_exp(session["username"], 15)
+    return render_template('games/snake.html')
+
+@app.route('/brickbreaker')
+def brickbreaker():
+    if "username" not in session:
+        return redirect(url_for("login"))
+    add_exp(session["username"], 15)
+    return render_template('games/brickbreaker.html')
+
+@app.route('/games/space-shooter')
+def space_shooter():
+    if "username" not in session:
+        return redirect(url_for("login"))
+    add_exp(session["username"], 15)
+    return render_template('games/space_shooter.html')
+
+@app.route('/fruitcatcher')
+def fruitcatcher():
+    if "username" not in session:
+        return redirect(url_for("login"))
+    add_exp(session["username"], 15)
+    return render_template('games/fruitcatcher.html')
+
+@app.route('/maze_escape')
+def maze_escape():
+    if "username" not in session:
+        return redirect(url_for("login"))
+    add_exp(session["username"], 15)
+    return render_template('games/maze_escape.html')
+
+@app.route('/flappy')
+def flappy():
+    if "username" not in session:
+        return redirect(url_for("login"))
+    add_exp(session["username"], 15)
+    return render_template('games/flappy.html')
+
+@app.route('/runner')
+def runner():
+    if "username" not in session:
+        return redirect(url_for("login"))
+    add_exp(session["username"], 15)
+    return render_template('games/runner.html')
 # -----------------------
 # Run
 # -----------------------
