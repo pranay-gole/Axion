@@ -238,6 +238,7 @@ def update_profile():
 # Admin Panel
 # -----------------------
 @app.route("/admin")
+@app.route("/admin/")
 def admin_panel():
     if "username" not in session:
         return redirect(url_for("login"))
