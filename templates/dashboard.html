@@ -155,6 +155,13 @@
       box-shadow: 0 0 20px #00fff7aa;
     }
 
+    .top-left-buttons {
+      position: absolute;
+      top: 20px;
+      left: 30px;
+      z-index: 4;
+    }
+
     /* Responsive tweaks */
     @media (max-width: 768px) {
       .topbar { flex-direction: column; gap: 10px; padding: 12px; }
@@ -181,6 +188,10 @@
   <div class="top-buttons">
     <a href="{{ url_for('profile') }}" class="top-btn">👤 Profile</a>
     <a href="/leaderboard" class="top-btn">🏆 Leaderboard</a>
+  </div>
+
+  <div class="top-left-buttons">
+    <a href="/help" class="top-btn">Help ❓</a>
   </div>
 
   <div class="container">

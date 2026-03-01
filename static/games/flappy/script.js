@@ -2,6 +2,10 @@ const canvas = document.getElementById("gameCanvas");
 const ctx = canvas.getContext("2d");
 const scoreDisplay = document.getElementById("score");
 const overlayText = document.getElementById("overlayText");
+const gameOverOverlay = document.getElementById("gameOverOverlay");
+const finalScore = document.getElementById("finalScore");
+const bgMusic = document.getElementById("bgMusic");
+const loseSound = document.getElementById("loseSound");
 
 let orb = { x: 0, y: 0, radius: 15, velocity: 0 };
 let gravity = 0.5;
@@ -26,6 +30,9 @@ resizeCanvas();
 function startGame() {
   started = true;
   overlayText.classList.add("hidden");
+
+  bgMusic.volume = 0.8; // adjust 0.0 to 1.0
+  bgMusic.play();
 }
 
 function restartGame() {
@@ -40,6 +47,9 @@ function restartGame() {
 
   scoreDisplay.textContent = "0";
   overlayText.classList.add("hidden");
+  gameOverOverlay.classList.add("hidden");
+  bgMusic.currentTime = 0;
+  bgMusic.play();
 }
 
 function pauseGame() {
@@ -99,10 +109,10 @@ function update() {
 
   // ✅ Handle game over overlay safely
   if (gameOver) {
-  overlayText.textContent = "Press R to Restart";
-  overlayText.classList.remove("hidden");
+  overlayText.classList.add("hidden");
+  finalScore.textContent = score;
+  gameOverOverlay.classList.remove("hidden");
   }
-
   ctx.clearRect(0, 0, canvas.width, canvas.height);
   ctx.fillStyle = "rgba(0, 10, 20, 0.3)";
   ctx.fillRect(0, 0, canvas.width, canvas.height);
@@ -123,17 +133,27 @@ function update() {
         scoreDisplay.textContent = score;
       }
 
-      if (
+    if (
         orb.x + orb.radius > pipe.x &&
         orb.x - orb.radius < pipe.x + 50 &&
         (orb.y - orb.radius < pipe.top || orb.y + orb.radius > pipe.bottom)
       ) {
-        gameOver = true;
+        if (!gameOver) {
+          gameOver = true;
+          bgMusic.pause();
+          loseSound.currentTime = 0;
+          loseSound.play();
+        }
       }
     });
 
     if (orb.y + orb.radius > canvas.height || orb.y - orb.radius < 0) {
-      gameOver = true;
+      if (!gameOver) {
+        gameOver = true;
+        bgMusic.pause();
+        loseSound.currentTime = 0;
+        loseSound.play();
+      }
     }
 
     drawPipes();

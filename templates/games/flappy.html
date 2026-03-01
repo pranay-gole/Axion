@@ -23,7 +23,20 @@
       <div id="overlayText" class="center-overlay">
         Press S to Start
       </div>
+      <div id="gameOverOverlay" class="game-over-overlay hidden">
+        <div class="game-over-box">
+          <h1>GAME OVER</h1>
+          <p>Score: <span id="finalScore">0</span></p>
+          <p class="restart-text">Press R to Restart</p>
+        </div>
+      </div>
           
+      <audio id="bgMusic" loop>
+        <source src="{{ url_for('static', filename='games/flappy/music.mp3') }}" type="audio/mpeg">
+      </audio>
+      <audio id="loseSound">
+        <source src="{{ url_for('static', filename='games/flappy/lose.mp3') }}" type="audio/mpeg">
+      </audio>
     </div>
   </div>
 

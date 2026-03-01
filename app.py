@@ -233,6 +233,11 @@ def update_profile():
 
     return redirect(url_for("profile"))
 
+@app.route("/help")
+def help_page():
+    if "username" not in session:
+        return redirect(url_for("login"))
+    return render_template("help.html")
 
 # -----------------------
 # Admin Panel
@@ -254,6 +259,21 @@ def admin_panel():
 
     return render_template("admin.html", users=users)
 
+@app.route("/dashboard/admin")
+def dashboard_admin():
+    if "username" not in session:
+        return redirect(url_for("login"))
+
+    if session.get("is_admin") != 1:
+        return "<h2>Access Denied 🚫</h2>"
+
+    conn = get_db_connection()
+    cur = conn.cursor()
+    cur.execute("SELECT username, email, dob, exp FROM users")
+    users = cur.fetchall()
+    conn.close()
+
+    return render_template("admin.html", users=users)
 
 # -----------------------
 # Leaderboard

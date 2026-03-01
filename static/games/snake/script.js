@@ -22,7 +22,7 @@ let speed = baseSpeed;
 let eatCount = 0;
 
 const scoreDisplay = document.getElementById('score');
-const deathSound = new Audio("/static/games/snake/death.wav");
+const deathSound = new Audio("/static/games/snake/death.mp3");
 
 // === Spawn Food ===
 function spawnFood() {
@@ -176,8 +176,11 @@ function moveSnake() {
 }
 
 function endGame() {
-  gameOver = true;
-  deathSound.play();
+  if (!gameOver) {
+    gameOver = true;
+    deathSound.currentTime = 0;
+    deathSound.play();
+  }
 }
 
 function resetGame() {
