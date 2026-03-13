@@ -57,6 +57,47 @@ canvas {
   to {opacity: 1;}
 }
 
+.gameover-card{
+  text-align:center;
+  padding:40px 60px;
+  border-radius:16px;
+  border:2px solid #00ffff;
+  background:rgba(0,0,0,0.95);
+  box-shadow:none;
+}
+
+.gameover-title{
+  font-size:48px;
+  color:#ff4d4d;
+  margin-bottom:20px;
+  letter-spacing:3px;
+}
+
+.gameover-score,
+.gameover-high{
+  font-size:20px;
+  margin:10px 0;
+  color:#ffffff;
+}
+
+.restart-btn{
+  margin-top:25px;
+  padding:12px 28px;
+  border:2px solid #00ffff;
+  border-radius:10px;
+  font-size:18px;
+  letter-spacing:1px;
+  color:#ffffff;
+  display:inline-block;
+  min-width:200px;
+  text-align:center;
+}
+
+.restart-btn span{
+  color:#00ffff;
+  font-weight:bold;
+}
+
 .exit-gate {
   position: absolute;
   top: 16px;

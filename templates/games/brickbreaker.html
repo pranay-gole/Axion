@@ -8,32 +8,52 @@
 </head>
 <body>
 
-  <!-- 🔥 Exit Gate Added -->
+  <!-- Exit Gate -->
   <a href="{{ url_for('dashboard') }}" class="exit-gate">
     <span class="exit-gate-icon">⮌</span>
     <span>Exit Gate</span>
   </a>
 
+  <!-- Game Canvas -->
   <canvas id="brickCanvas"></canvas>
 
-   <div id="startScreen" class="overlay">
-      <div class="mini-card">
-        Press <span>S</span> to Start
-      </div>
+  <!-- Start Screen -->
+  <div id="startScreen" class="overlay">
+    <div class="mini-card">
+      Press <span>S</span> to Start
     </div>
+  </div>
 
-    <div id="pauseScreen" class="overlay hidden">
-      <div class="mini-card">
-        Press <span>P</span> to Resume
-      </div>
+  <!-- Pause Screen -->
+  <div id="pauseScreen" class="overlay hidden">
+    <div class="mini-card">
+      Press <span>P</span> to Resume
     </div>
+  </div>
 
-    <div id="gameOverScreen" class="overlay hidden">
-      <div class="mini-card">
+  <!-- Game Over Screen -->
+  <div id="gameOverScreen" class="overlay hidden">
+    <div class="gameover-card">
+
+      <h1 class="gameover-title">GAME OVER</h1>
+
+      <p class="gameover-score">
+        Score: <span id="finalScore">0</span>
+      </p>
+
+      <p class="gameover-high">
+        High Score: <span id="finalHigh">0</span>
+      </p>
+
+      <div class="restart-btn">
         Press <span>R</span> to Restart
       </div>
-    </div>
 
+    </div>
+  </div>
+
+  <!-- Game Script -->
   <script src="{{ url_for('static', filename='games/brickbreaker/script.js') }}"></script>
+
 </body>
 </html>

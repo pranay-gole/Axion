@@ -3,6 +3,8 @@ const ctx = canvas.getContext("2d");
 canvas.width = window.innerWidth;
 canvas.height = window.innerHeight;
 
+const currentUser = localStorage.getItem("currentUser");
+
 // --- Game state ---
 let cols, rows, cellSize;
 let maze = [];
@@ -12,7 +14,8 @@ let timeLeft = 30;
 let timerInterval;
 let powerUps = [];
 let state = "start"; 
-let level = Number(localStorage.getItem("mazeLevel")) || 1;
+let level = Number(localStorage.getItem("mazeLevel_" + currentUser)) || 1;
+
 const levelScreen = document.getElementById("levelScreen");
 const startScreen = document.getElementById("startScreen");
 const pauseScreen = document.getElementById("pauseScreen");
@@ -165,19 +168,11 @@ function drawMaze() {
     if (cell.walls[3]) drawLine(x, y + cellSize, x, y);
   });
 
-  // Goal
   ctx.fillStyle = "#ffaa00";
   ctx.beginPath();
-  ctx.arc(
-    goal.i * cellSize + cellSize / 2,
-    goal.j * cellSize + cellSize / 2,
-    cellSize / 4,
-    0,
-    Math.PI * 2
-  );
+  ctx.arc(goal.i * cellSize + cellSize / 2, goal.j * cellSize + cellSize / 2, cellSize / 4, 0, Math.PI * 2);
   ctx.fill();
 
-  // Power-ups
   const glowRadius = Math.sin(Date.now() / 300) * 4 + 8;
   powerUps.forEach(p => {
     if (p.active) {
@@ -193,18 +188,11 @@ function drawMaze() {
     }
   });
 
-  // Player (RED)
   ctx.fillStyle = "#ff3b3b";
   ctx.shadowColor = "#ff3b3b";
   ctx.shadowBlur = 15;
   ctx.beginPath();
-  ctx.arc(
-    player.i * cellSize + cellSize / 2,
-    player.j * cellSize + cellSize / 2,
-    cellSize / 3,
-    0,
-    Math.PI * 2
-  );
+  ctx.arc(player.i * cellSize + cellSize / 2, player.j * cellSize + cellSize / 2, cellSize / 3, 0, Math.PI * 2);
   ctx.fill();
   ctx.shadowBlur = 0;
 
@@ -239,8 +227,64 @@ function drawUI() {
   ctx.fillText(`Level ${level}`, x + boxWidth / 2, y + 50);
 }
 
-// === Controls ===
+function animate() {
+  drawMaze();
+  if (state === "win") drawConfetti();
+  requestAnimationFrame(animate);
+}
+
+document.addEventListener("keydown", e => {
+
+  if ((e.key === "S" || e.key === "s") && state === "start") {
+    startGame();
+  }
+
+  if (state === "playing") {
+    if (e.key === "ArrowUp" || e.key === "w" || e.key === "W") movePlayer("UP");
+    if (e.key === "ArrowDown" || e.key === "s" || e.key === "S") movePlayer("DOWN");
+    if (e.key === "ArrowLeft" || e.key === "a" || e.key === "A") movePlayer("LEFT");
+    if (e.key === "ArrowRight" || e.key === "d" || e.key === "D") movePlayer("RIGHT");
+  }
+
+  if ((e.key === "N" || e.key === "n") && state === "levelcomplete") {
+    level++;
+    localStorage.setItem("mazeLevel_" + currentUser, level);
+    startGame();
+  }
+
+  if ((e.key === "R" || e.key === "r") &&
+      (state === "gameover" || state === "win")) {
+    restartGame();
+  }
+
+  if (e.key === "P" || e.key === "p") {
+    togglePause();
+  }
+
+});
+
+generateMaze();
+animate();
+
+state = "start";
+startScreen.classList.remove("hidden");
+
+
+// === ADDED FUNCTIONS (nothing above changed) ===
+
+let confetti = [];
+
+function drawConfetti() {
+  confetti.forEach(p => {
+    ctx.fillStyle = p.color;
+    ctx.fillRect(p.x, p.y, p.size, p.size);
+    p.y += p.speedY;
+    if (p.y > canvas.height) p.y = 0;
+  });
+}
+
 function movePlayer(dir) {
+
   if (state !== "playing") return;
 
   let next = { i: player.i, j: player.j };
@@ -261,21 +305,21 @@ function movePlayer(dir) {
     }
   });
 
-  // ✅ GOAL CHECK MUST BE HERE
   if (player.i === goal.i && player.j === goal.j) {
 
     clearInterval(timerInterval);
 
     if (level >= 10) {
       state = "win";
-      localStorage.removeItem("mazeLevel");
       winScreen.classList.remove("hidden");
     } else {
       state = "levelcomplete";
       levelScreen.classList.remove("hidden");
-      localStorage.setItem("mazeLevel", level);
+      localStorage.setItem("mazeLevel_" + currentUser, level);
     }
+
   }
+
 }
 
 function startGame() {
@@ -301,15 +345,20 @@ function startGame() {
     timeLeft--;
 
     if (timeLeft <= 0) {
-  clearInterval(timerInterval);
-  state = "gameover";
-  gameOverScreen.classList.remove("hidden");
-}
+
+      clearInterval(timerInterval);
+      state = "gameover";
+      gameOverScreen.classList.remove("hidden");
+
+    }
+
   }, 1000);
+
 }
 
 function restartGame() {
-  localStorage.removeItem("mazeLevel");
+
+  localStorage.removeItem("mazeLevel_" + currentUser);
   level = 1;
   state = "start";
 
@@ -318,7 +367,9 @@ function restartGame() {
   pauseScreen.classList.add("hidden");
 
   startScreen.classList.remove("hidden");
+
   clearInterval(timerInterval);
+
 }
 
 function togglePause() {
@@ -331,75 +382,5 @@ function togglePause() {
     state = "playing";
     pauseScreen.classList.add("hidden");
   }
+
 }
-
-// === Confetti effect ===
-let confetti = [];
-function createConfetti() {
-  confetti = [];
-  for (let i = 0; i < 150; i++) {
-    confetti.push({
-      x: Math.random() * canvas.width,
-      y: Math.random() * canvas.height,
-      color: `hsl(${Math.random() * 360}, 100%, 60%)`,
-      size: Math.random() * 5 + 2,
-      speedY: Math.random() * 3 + 1
-    });
-  }
-}
-
-function drawConfetti() {
-  confetti.forEach(p => {
-    ctx.fillStyle = p.color;
-    ctx.fillRect(p.x, p.y, p.size, p.size);
-    p.y += p.speedY;
-    if (p.y > canvas.height) p.y = 0;
-  });
-}
-
-document.addEventListener("keydown", e => {
-
-  // Movement only while playing
-  if (state === "playing") {
-    if (e.key === "ArrowUp" || e.key === "w") movePlayer("UP");
-    if (e.key === "ArrowDown" || e.key === "s") movePlayer("DOWN");
-    if (e.key === "ArrowLeft" || e.key === "a") movePlayer("LEFT");
-    if (e.key === "ArrowRight" || e.key === "d") movePlayer("RIGHT");
-  }
-
-  // Start
-  if ((e.key === "S" || e.key === "s") && state === "start") {
-    startGame();
-  }
-
-  // Next level
-  if ((e.key === "N" || e.key === "n") && state === "levelcomplete") {
-    level++;
-    localStorage.setItem("mazeLevel", level);
-    startGame();
-  }
-
-  // Restart
-  if ((e.key === "R" || e.key === "r") && 
-      (state === "gameover" || state === "win")) {
-    restartGame();
-  }
-
-  // Pause toggle
-  if (e.key === "P" || e.key === "p") {
-    togglePause();
-  }
-
-});
-
-function animate() {
-  drawMaze();
-  if (state === "win") drawConfetti();
-  requestAnimationFrame(animate);
-}
-
-generateMaze();
-animate();
-
-state = "start";
-startScreen.classList.remove("hidden");

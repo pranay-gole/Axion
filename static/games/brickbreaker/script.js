@@ -1,9 +1,9 @@
 const startScreen = document.getElementById("startScreen");
 const pauseScreen = document.getElementById("pauseScreen");
 const gameOverScreen = document.getElementById("gameOverScreen");
-const finalScoreText = document.getElementById("finalScore");
 const canvas = document.getElementById("brickCanvas");
 const ctx = canvas.getContext("2d");
+const gameOverSound = new Audio("/static/games/brickbreaker/sounds/gameover.wav");
 canvas.width = 800;
 canvas.height = 500;
 
@@ -22,6 +22,15 @@ let paused = false;
 let gameRunning = false;
 let score = 0;
 let level = 1;
+let lives = 3;
+let highScore = localStorage.getItem("brickHighScore") || 0;
+let powerUps = [];
+const powerTypes = [
+  { type: "life", color: "#00ff00" },
+  { type: "paddle", color: "#00aaff" },
+  { type: "slow", color: "#ffff00" },
+  { type: "multi", color: "#ff4444" }
+];
 const maxLevel = 15;
 
 const brick = {
@@ -41,14 +50,103 @@ const levelColors = [
   "#ff6600", "#ffaa00", "#ffff00", "#99ff33", "#33ff77", "#00ffcc", "#0099ff", "#6666ff"
 ];
 
+const layouts = [
+
+  // Level 1
+  [
+    [1,1,1,1,1,1,1,1],
+    [1,1,1,1,1,1,1,1],
+    [1,1,1,1,1,1,1,1]
+  ],
+
+  // Level 2
+  [
+    [1,1,1,1,1,1,1,1],
+    [0,1,1,0,0,1,1,0],
+    [1,1,1,1,1,1,1,1]
+  ],
+
+  // Level 3
+  [
+    [0,1,1,1,1,1,1,0],
+    [1,1,0,0,0,0,1,1],
+    [0,1,1,1,1,1,1,0]
+  ],
+
+  // Level 4
+  [
+    [0,0,0,1,1,0,0,0],
+    [0,1,1,1,1,1,1,0],
+    [1,1,1,1,1,1,1,1]
+  ],
+
+  // Level 5
+  [
+    [1,0,1,0,0,1,0,1],
+    [0,1,1,1,1,1,1,0],
+    [1,0,1,0,0,1,0,1]
+  ],
+
+  // Level 6
+  [
+    [1,1,0,1,1,0,1,1],
+    [1,0,1,0,0,1,0,1],
+    [1,1,0,1,1,0,1,1]
+  ],
+
+  // Level 7
+  [
+    [1,0,1,1,1,1,0,1],
+    [0,1,0,1,1,0,1,0],
+    [1,0,1,1,1,1,0,1]
+  ],
+
+  // Level 8
+  [
+    [1,1,1,0,0,1,1,1],
+    [1,0,1,1,1,1,0,1],
+    [1,1,1,0,0,1,1,1]
+  ],
+
+];
+
 // Initialize bricks
 function initBricks() {
+
   bricks = [];
+
   const color = levelColors[(level - 1) % levelColors.length];
+
+  const layout = layouts[(level - 1) % layouts.length];
+
+  brick.rowCount = layout.length;
+  brick.columnCount = layout[0].length;
+
   for (let c = 0; c < brick.columnCount; c++) {
+
     bricks[c] = [];
+
     for (let r = 0; r < brick.rowCount; r++) {
-      bricks[c][r] = { x: 0, y: 0, visible: true, color: color };
+
+      if (layout[r][c] === 1) {
+
+        bricks[c][r] = {
+          x: 0,
+          y: 0,
+          visible: true,
+          color: color
+        };
+
+      } else {
+
+        bricks[c][r] = {
+          x: 0,
+          y: 0,
+          visible: false
+        };
+
+      }
+
     }
   }
 }
@@ -108,8 +206,107 @@ function drawBalls() {
 function drawScore() {
   ctx.font = "18px Orbitron";
   ctx.fillStyle = "#00ffff";
+
   ctx.fillText(`Score: ${score}`, 20, 25);
   ctx.fillText(`Level: ${level}`, canvas.width - 120, 25);
+  ctx.fillText(`Lives: ${lives}`, canvas.width / 2 - 30, 25);
+  ctx.fillText(`High: ${highScore}`, canvas.width / 2 - 300, 25);
+}
+
+function drawPowerUps() {
+
+  powerUps.forEach(p => {
+
+    ctx.beginPath();
+    ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+    ctx.fillStyle = p.color;
+    ctx.shadowBlur = 15;
+    ctx.shadowColor = p.color;
+    ctx.fill();
+    ctx.closePath();
+
+    ctx.shadowBlur = 0;
+
+  });
+
+}
+
+function updatePowerUps() {
+
+  powerUps.forEach((p, index) => {
+
+    p.y += p.dy;
+
+    // Paddle catch
+    if (
+      p.y > paddle.y &&
+      p.x > paddle.x &&
+      p.x < paddle.x + paddle.width
+    ) {
+
+      activatePower(p.type);
+      powerUps.splice(index, 1);
+
+    }
+
+    // Remove if off screen
+    if (p.y > canvas.height) {
+      powerUps.splice(index, 1);
+    }
+
+  });
+
+}
+
+function activatePower(type) {
+
+  if (type === "life") {
+
+    lives++;
+
+  }
+
+  if (type === "paddle") {
+
+    paddle.width += 40;
+
+    setTimeout(() => {
+      paddle.width -= 40;
+    }, 10000);
+
+  }
+
+  if (type === "slow") {
+
+    balls.forEach(ball => {
+      ball.dx *= 0.7;
+      ball.dy *= 0.7;
+    });
+
+  }
+
+  if (type === "multi") {
+
+  const extraBall = {
+    x: canvas.width / 2,
+    y: canvas.height / 2,
+    dx: 3,
+    dy: -3,
+    radius: 8,
+    color: "#00ffff",
+    temporary: true
+  };
+
+  balls.push(extraBall);
+
+  // remove after 10 seconds
+  setTimeout(() => {
+    const index = balls.indexOf(extraBall);
+    if (index !== -1) balls.splice(index, 1);
+  }, 10000);
+
+}
+
 }
 
 // Collision detection
@@ -126,7 +323,27 @@ function collisionDetection(ball) {
           b.visible = false;
           score++;
 
-          if (score % (brick.rowCount * brick.columnCount) === 0) {
+          // Random power drop
+          if (Math.random() < 0.25) {
+
+            const power = powerTypes[Math.floor(Math.random() * powerTypes.length)];
+
+            powerUps.push({
+              x: b.x + brick.width / 2,
+              y: b.y,
+              dy: 2,
+              type: power.type,
+              color: power.color,
+              radius: 8
+            });
+
+          }
+          if (score > highScore) {
+            highScore = score;
+            localStorage.setItem("brickHighScore", highScore);
+          }
+
+          if (bricks.flat().every(b => !b.visible)) {
             nextLevel();
           }
         }
@@ -143,6 +360,8 @@ function draw() {
   drawBricks();
   drawPaddle();
   drawBalls();
+  drawPowerUps();
+  updatePowerUps();
   drawScore();
 
   // Move paddle
@@ -165,9 +384,22 @@ function draw() {
         ball.dx *= 1.05;
         ball.dy *= 1.05;
       } else if (ball.y + ball.dy > canvas.height - ball.radius) {
+
+      if (ball.temporary) {
         balls.splice(balls.indexOf(ball), 1);
-        if (balls.length === 0) gameOver();
+      } else {
+
+        lives--;
+
+        if (lives > 0) {
+          initBalls(1);
+        } else {
+          gameOver();
+        }
+
       }
+
+    }
     }
 
     collisionDetection(ball);
@@ -208,14 +440,24 @@ function nextLevel() {
   });
 }
 
-function gameOver() {
+function gameOver(){
+
+  gameOverSound.play();
+
+  document.getElementById("finalScore").textContent = score;
+  document.getElementById("finalHigh").textContent = highScore;
+
   gameOverScreen.classList.remove("hidden");
+
   gameRunning = false;
+
 }
 
 function restartGame() {
   score = 0;
   level = 1;
+  lives = 3;
+  powerUps = [];
   initBricks();
   initBalls(1);
   gameOverScreen.classList.add("hidden");

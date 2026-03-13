@@ -51,6 +51,10 @@
     </div>
   </div>
 
+  <script>
+  localStorage.setItem("currentUser", "{{ session['username'] }}");
+  </script>
+
   <script src="{{ url_for('static', filename='games/maze_escape/script.js') }}"></script>
 </body>
 </html>
