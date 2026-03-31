@@ -16,6 +16,7 @@ let score = 0;
 let gameOver = false;
 let started = false;
 let paused = false;
+let expGiven = false;
 
 // Resize canvas to full window
 function resizeCanvas() {
@@ -36,6 +37,7 @@ function startGame() {
 }
 
 function restartGame() {
+  expGiven = false;
   orb.y = canvas.height / 2;
   orb.velocity = 0;
   pipes = [];
@@ -139,21 +141,33 @@ function update() {
         (orb.y - orb.radius < pipe.top || orb.y + orb.radius > pipe.bottom)
       ) {
         if (!gameOver) {
-          gameOver = true;
-          bgMusic.pause();
-          loseSound.currentTime = 0;
-          loseSound.play();
+        gameOver = true;
+
+        if (!expGiven) {
+          fetch('/add_exp', { method: 'POST' });
+          expGiven = true;
         }
+
+        bgMusic.pause();
+        loseSound.currentTime = 0;
+        loseSound.play();
+      }
       }
     });
 
     if (orb.y + orb.radius > canvas.height || orb.y - orb.radius < 0) {
       if (!gameOver) {
-        gameOver = true;
-        bgMusic.pause();
-        loseSound.currentTime = 0;
-        loseSound.play();
+      gameOver = true;
+
+      if (!expGiven) {
+        fetch('/add_exp', { method: 'POST' });
+        expGiven = true;
       }
+
+      bgMusic.pause();
+      loseSound.currentTime = 0;
+      loseSound.play();
+    }
     }
 
     drawPipes();

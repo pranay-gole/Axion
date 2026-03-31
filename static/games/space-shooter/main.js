@@ -81,6 +81,8 @@
     }
   });
 
+let expGiven = false;
+
   // === Core Functions ===
   function start() {
     running = true;
@@ -96,6 +98,7 @@
   }
 
   function restart() {
+    expGiven = false;
     score = 0;
     wave = 1;
     over = false;
@@ -344,11 +347,17 @@
   }
 
   function gameOver() {
+
+    if (!expGiven) {
+      fetch('/add_exp', { method: 'POST' });
+      expGiven = true;
+    }
+
     over = true;
     running = false;
     ui.overUI.style.display = "block";
     ui.final.textContent = score;
-  }
+}
 
   function render(dt) {
     drawBG(dt);

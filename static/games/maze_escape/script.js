@@ -6,6 +6,7 @@ canvas.height = window.innerHeight;
 const currentUser = localStorage.getItem("currentUser");
 
 // --- Game state ---
+let expGiven = false;
 let cols, rows, cellSize;
 let maze = [];
 let stack = [];
@@ -307,6 +308,11 @@ function movePlayer(dir) {
 
   if (player.i === goal.i && player.j === goal.j) {
 
+    if (!expGiven) {
+      fetch('/add_exp', { method: 'POST' });
+      expGiven = true;
+    }
+
     clearInterval(timerInterval);
 
     if (level >= 10) {
@@ -346,6 +352,11 @@ function startGame() {
 
     if (timeLeft <= 0) {
 
+      if (!expGiven) {
+        fetch('/add_exp', { method: 'POST' });
+        expGiven = true;
+      }
+
       clearInterval(timerInterval);
       state = "gameover";
       gameOverScreen.classList.remove("hidden");
@@ -357,6 +368,7 @@ function startGame() {
 }
 
 function restartGame() {
+  expGiven = false;
 
   localStorage.removeItem("mazeLevel_" + currentUser);
   level = 1;

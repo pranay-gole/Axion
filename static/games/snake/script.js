@@ -16,6 +16,7 @@ let score = 0;
 let gameOver = false;
 let paused = false;
 let started = false;
+let expGiven = false;
 let lastTime = 0;
 let baseSpeed = 150;
 let speed = baseSpeed;
@@ -177,6 +178,12 @@ function moveSnake() {
 
 function endGame() {
   if (!gameOver) {
+
+    if (!expGiven) {
+      fetch('/add_exp', { method: 'POST' });
+      expGiven = true;
+    }
+
     gameOver = true;
     deathSound.currentTime = 0;
     deathSound.play();
@@ -184,6 +191,8 @@ function endGame() {
 }
 
 function resetGame() {
+  expGiven = false;
+  
   snake = [{ x: 5 * grid, y: 5 * grid }];
   direction = { x: 1, y: 0 };
   score = 0;

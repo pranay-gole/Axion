@@ -3,21 +3,19 @@ import psycopg
 import os
 from werkzeug.security import generate_password_hash, check_password_hash
 from datetime import timedelta
+
+app = Flask(__name__)
+
 from dotenv import load_dotenv
 load_dotenv()
 
-app = Flask(__name__)
 app.secret_key = os.environ.get("SECRET_KEY", "fallback_dev_key")
 app.permanent_session_lifetime = timedelta(days=7)
 
 def get_db_connection():
-    DATABASE_URL = os.environ.get("DATABASE_URL")
-    print("DATABASE_URL =", DATABASE_URL)
+    DATABASE_URL = "postgresql://auto:xZpZRMVmntG1Fnbj4cTK4H5coRWYBxXT@dpg-d75q17i4d50c73cks4hg-a.oregon-postgres.render.com/auto_1qh3"
 
-    if not DATABASE_URL:
-        raise Exception("DATABASE_URL not set in environment variables")
-
-    if DATABASE_URL and DATABASE_URL.startswith("postgres://"):
+    if DATABASE_URL.startswith("postgres://"):
         DATABASE_URL = DATABASE_URL.replace("postgres://", "postgresql://", 1)
 
     conn = psycopg.connect(DATABASE_URL, sslmode="require")
@@ -302,7 +300,6 @@ def leaderboard():
 
     return render_template("leaderboard.html", users=ranked_users)
 
-
 # -----------------------
 # Game Routes
 # -----------------------
@@ -310,60 +307,69 @@ def leaderboard():
 def memory():
     if "username" not in session:
         return redirect(url_for("login"))
-    add_exp(session["username"], 15)
     return render_template('games/memory.html')
+
 
 @app.route('/snake')
 def snake():
     if "username" not in session:
         return redirect(url_for("login"))
-    add_exp(session["username"], 15)
     return render_template('games/snake.html')
+
 
 @app.route('/brickbreaker')
 def brickbreaker():
     if "username" not in session:
         return redirect(url_for("login"))
-    add_exp(session["username"], 15)
     return render_template('games/brickbreaker.html')
+
 
 @app.route('/games/space-shooter')
 def space_shooter():
     if "username" not in session:
         return redirect(url_for("login"))
-    add_exp(session["username"], 15)
     return render_template('games/space_shooter.html')
+
 
 @app.route('/fruitcatcher')
 def fruitcatcher():
     if "username" not in session:
         return redirect(url_for("login"))
-    add_exp(session["username"], 15)
     return render_template('games/fruit_catcher.html')
+
 
 @app.route('/maze_escape')
 def maze_escape():
     if "username" not in session:
         return redirect(url_for("login"))
-    add_exp(session["username"], 15)
     return render_template('games/maze_escape.html')
+
 
 @app.route('/flappy')
 def flappy():
     if "username" not in session:
         return redirect(url_for("login"))
-    add_exp(session["username"], 15)
     return render_template('games/flappy.html')
+
 
 @app.route('/runner')
 def runner():
     if "username" not in session:
         return redirect(url_for("login"))
-    add_exp(session["username"], 15)
     return render_template('games/runner.html')
+
+@app.route('/add_exp', methods=['POST'])
+def give_exp():
+    if "username" not in session:
+        return "Not logged in", 401
+
+    add_exp(session["username"], 15)
+    return "EXP added"
+
 # -----------------------
 # Run
 # -----------------------
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 10000))
     app.run(host="0.0.0.0", port=port, debug=True)
+

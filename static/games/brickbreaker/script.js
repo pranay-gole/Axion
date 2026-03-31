@@ -16,6 +16,7 @@ let paddle = {
   speed: 8,
 };
 
+let expGiven = false;
 let rightPressed = false;
 let leftPressed = false;
 let paused = false;
@@ -442,6 +443,10 @@ function nextLevel() {
 
 function gameOver(){
 
+  if (!expGiven) {
+        fetch('/add_exp', { method: 'POST' });
+        expGiven = true;
+    }
   gameOverSound.play();
 
   document.getElementById("finalScore").textContent = score;
@@ -454,6 +459,7 @@ function gameOver(){
 }
 
 function restartGame() {
+  expGiven = false;
   score = 0;
   level = 1;
   lives = 3;

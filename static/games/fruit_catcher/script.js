@@ -19,6 +19,7 @@ let basket = {
   movingRight: false
 };
 
+let expGiven = false;
 let fruits = [];
 let score = 0;
 let level = 1;
@@ -161,6 +162,12 @@ function showLevelUp() {
 }
 
 function triggerBombLose() {
+
+  if (!expGiven) {
+    fetch('/add_exp', { method: 'POST' });
+    expGiven = true;
+  }
+
   gameRunning = false;
   clearTimeout(spawnInterval);
 
@@ -228,6 +235,7 @@ function startGame() {
 }
 
 function restartGame() {
+  expGiven = false;
   score = 0;
   level = 1;
   fruitSpeed = 3.2;

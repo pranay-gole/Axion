@@ -9,6 +9,7 @@ let lock = false;
 let currentPlayer = 1;
 let scores = { 1: 0, 2: 0 };
 let gameMode = "single";
+let expGiven = false;
 
 function $(sel){ return document.querySelector(sel); }
 
@@ -128,6 +129,12 @@ function aiTurn(){
 /* ================= GAME OVER ================= */
 
 function showGameOver(){
+
+    if (!expGiven) {
+      fetch('/add_exp', { method: 'POST' });
+      expGiven = true;
+    }
+
   const p1 = scores[1];
   const p2 = scores[2];
 
@@ -166,6 +173,7 @@ function showGameOver(){
 /* ================= INIT ================= */
 
 function initGame(){
+  expGiven = false;
   const board = $('#gameBoard');
   board.innerHTML = '';
   matchedPairs = 0;

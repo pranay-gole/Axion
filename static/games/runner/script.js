@@ -6,6 +6,7 @@ canvas.height = window.innerHeight;
 
 let groundY = canvas.height - 140;
 let gameState = "running";
+let expGiven = false;
 
 /* ================= BACKGROUND ================= */
 
@@ -122,6 +123,12 @@ function update() {
       player.y + 44 > spikeTop
     ) {
       gameState = "gameover";
+
+      
+      if (!expGiven) {
+        fetch('/add_exp', { method: 'POST' });
+        expGiven = true;
+      }
 
       if (score > bestScore) {
         bestScore = score;
